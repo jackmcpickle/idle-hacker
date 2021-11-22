@@ -1,0 +1,16 @@
+module.exports = {
+  presets: [
+    [
+      '@babel/preset-react',
+      {
+        pragma: 'h',
+        pragmaFrag: 'Fragment',
+      },
+    ],
+    '@babel/preset-typescript',
+  ],
+  plugins: [
+    '@babel/plugin-syntax-import-meta',
+    '@prefresh/babel-plugin'
+  ],
+};
