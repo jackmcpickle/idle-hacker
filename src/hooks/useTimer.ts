@@ -1,20 +1,31 @@
-import { useState } from 'react';
+import { IncomeType } from '@/models/incomes';
+import { collectIncome } from '@/state/actions';
+import { useGlobalStateProvider } from '@/state/context';
+import { useEffect, useState } from 'react';
 import { useInterval } from 'react-use';
 
 export const INTERVAL = 100;
 
-export function useTimer(countDown: number, hasInventory: boolean) {
+export function useTimer(incomeType: IncomeType) {
     const [time, setTime] = useState(0);
+    const { dispatch } = useGlobalStateProvider();
 
     useInterval(
         () => {
-            time < countDown ? setTime(time + INTERVAL) : setTime(0);
+            time < incomeType.getCountdown() ? setTime(time + INTERVAL) : setTime(0);
         },
-        hasInventory ? INTERVAL : null
+        incomeType.hasInventory() ? INTERVAL : null
     );
+
+    useEffect(() => {
+        if (time >= incomeType.getCountdown()) {
+            dispatch(collectIncome(incomeType.getIncome()));
+        }
+    }, [incomeType, time]);
 
     return {
         time,
-        percent: (time / countDown) * 100,
+        // if under 1sec just show at 100%
+        percent: incomeType.isFastCountdown() ? 100 : (time / incomeType.getCountdown()) * 100,
     };
 }

@@ -1,5 +1,6 @@
 import { INCOME_TYPES } from '@/models/incomes';
 import { CHANGE_PURCHASE_MULTIPLIER, COLLECT_INCOME, INCREASE_QTY } from '@/state/actions';
+import { roundHigh } from '@/utils/round';
 
 export type GameContext = typeof INITIAL_GAME_STATE;
 
@@ -21,26 +22,15 @@ export const INITIAL_GAME_STATE = {
 export const gameReducer = (state: GameContext, { type, data }: IncomeAction) => {
     switch (type) {
         case COLLECT_INCOME: {
-            return { ...state, bank: state.bank + data };
+            return { ...state, bank: roundHigh(state.bank + data) };
         }
         case INCREASE_QTY: {
             const incomeType = state.incomeTypes.find((type) => type.name === data.name);
-            const index = state.incomeTypes.indexOf(incomeType);
-            incomeType.addInventory = data.qty;
-            const cost = incomeType.getCost() * data.qty;
-
-            console.log('INCREASE_QTY', { cost, incomeType });
-
-            const incomeTypes = [
-                ...state.incomeTypes.slice(0, index),
-                incomeType,
-                ...state.incomeTypes.slice(index + 1),
-            ];
-
+            incomeType.addInventory(data.qty);
+            const cost = roundHigh(incomeType.getCost() * data.qty);
             return {
                 ...state,
-                incomeTypes,
-                bank: state.bank - cost,
+                bank: roundHigh(state.bank - cost),
             };
         }
         case CHANGE_PURCHASE_MULTIPLIER:

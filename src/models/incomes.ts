@@ -1,3 +1,6 @@
+import { roundHigh } from '@/utils/round';
+import { levelMultiplier } from './levels';
+
 interface IncomeConstructor {
     name: string;
     cost: number;
@@ -10,12 +13,12 @@ interface IncomeConstructor {
 
 export class IncomeType {
     name: string;
-    #cost: number;
-    #income: number;
-    #countdown: number;
-    #inventory: number;
-    #timeMultiplier: number;
-    #incomeMultiplier: number;
+    cost: number;
+    income: number;
+    countdown: number;
+    inventory: number;
+    timeMultiplier: number;
+    incomeMultiplier: number;
 
     constructor({
         name,
@@ -27,40 +30,60 @@ export class IncomeType {
         incomeMultiplier = 1,
     }: IncomeConstructor) {
         this.name = name;
-        this.#cost = cost;
-        this.#income = income;
-        this.#countdown = countdown;
-        this.#inventory = inventory;
-        this.#timeMultiplier = timeMultiplier;
-        this.#incomeMultiplier = incomeMultiplier;
+        this.cost = cost;
+        this.income = income;
+        this.countdown = countdown;
+        this.inventory = inventory;
+        this.timeMultiplier = timeMultiplier;
+        this.incomeMultiplier = incomeMultiplier;
     }
 
-    set addInventory(value: number) {
-        this.#inventory += value;
+    addInventory(value: number) {
+        this.inventory += value;
+        const level = levelMultiplier.find((level) => level.qty <= this.inventory);
+        console.log({level});
+        if (level) {
+            this.timeMultiplier = level.speed;
+            this.incomeMultiplier = level.income;
+        }
+    }
+
+    getValue() {
+        return roundHigh(Math.round(this.income * this.incomeMultiplier));
     }
 
     getInventory() {
-        return this.#inventory;
+        return this.inventory;
     }
 
     getCost() {
-        return this.#cost;
+        return this.cost;
     }
 
     getCountdown() {
-        return this.#countdown / this.#timeMultiplier;
+        return Math.max(this.countdown / this.timeMultiplier, 1000);
+    }
+
+    isFastCountdown() {
+        return this.getCountdown() <= 1000;
+    }
+
+    getCountdownSec() {
+        return (this.getCountdown() / 1000).toFixed(2);
     }
 
     getIncome() {
-        return this.#inventory * this.#income * this.#incomeMultiplier;
+        return roundHigh(Math.round(this.inventory * this.income * this.incomeMultiplier));
     }
 
     hasInventory() {
-        return this.#inventory > 0;
+        return this.inventory > 0;
     }
 }
 
 export const INCOME_TYPES = [
     new IncomeType({ name: 'Business Cards', cost: 10, income: 5, countdown: 2000, inventory: 1 }),
     new IncomeType({ name: 'Resume Updates', cost: 20, income: 10, countdown: 5000 }),
+    new IncomeType({ name: 'Basic Website', cost: 100, income: 50, countdown: 10000 }),
+    new IncomeType({ name: 'E-commerce site', cost: 1000, income: 500, countdown: 20000 }),
 ];

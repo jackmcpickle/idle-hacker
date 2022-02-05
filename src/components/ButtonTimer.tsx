@@ -1,50 +1,38 @@
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback } from 'react';
 import { useTimer } from '@/hooks/useTimer';
 import { classNames } from '@/utils/classNames';
 import { useGlobalStateProvider } from '@/state/context';
-import { collectIncome, increaseQty } from '@/state/actions';
+import { increaseQty } from '@/state/actions';
 import { IncomeType } from '@/models/incomes';
+import { usePurchasePower } from '@/hooks/usePurchasePower';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
     incomeType: IncomeType;
 }
 
 export const ButtonTimer: React.FC<ButtonProps> = ({ incomeType }) => {
-    const { state, dispatch } = useGlobalStateProvider();
-    const { percent } = useTimer(incomeType.getCountdown(), incomeType.hasInventory());
-
-    useEffect(() => {
-        if (percent === 100) {
-            dispatch(collectIncome(incomeType.getIncome()));
-        }
-    }, [incomeType, percent]);
-
-    const purchaseQty = useMemo((): number => {
-        return state.purchaseMultiplier.isPercent
-            ? Math.round((state.bank * (parseInt(state.purchaseMultiplier.value, 10) / 100)) / incomeType.getCost())
-            : parseInt(state.purchaseMultiplier.value, 10);
-    }, [state.purchaseMultiplier.value, state.bank]);
+    const { dispatch } = useGlobalStateProvider();
+    const { percent } = useTimer(incomeType);
+    const { canAfford, purchaseQty } = usePurchasePower(incomeType);
 
     const handleIncreaseQty = useCallback(
-        (purchaseQty = 1) => {
+        (purchaseQty: number) => {
             console.log('INCREASE', purchaseQty);
             dispatch(increaseQty(incomeType.name, purchaseQty));
         },
         [incomeType]
     );
 
-    const canAfford = state.bank >= incomeType.getCost() * purchaseQty;
-
     return (
         <button
             disabled={!canAfford}
-            className="relative inline-flex items-center w-full px-8 py-2 mx-auto mt-16 text-lg text-white border-0 rounded focus:outline-none group"
+            className="relative inline-flex items-center w-full px-8 py-2 mx-auto mt-16 text-lg text-white border-0 focus:outline-none group"
             onClick={() => handleIncreaseQty(purchaseQty)}
         >
             <div
                 className={classNames(
                     canAfford ? 'bg-lime-200 group-hover:bg-lime-300' : 'bg-slate-200',
-                    'absolute top-0 left-0 right-0 bottom-0 overflow-hidden h-full text-xs flex'
+                    'absolute top-0 left-0 right-0 bottom-0 overflow-hidden h-full text-xs flex rounded'
                 )}
             >
                 <div
@@ -52,6 +40,7 @@ export const ButtonTimer: React.FC<ButtonProps> = ({ incomeType }) => {
                     className={classNames(
                         canAfford ? 'bg-lime-500 group-hover:bg-lime-600' : '',
                         incomeType.hasInventory() && !canAfford ? 'bg-slate-400' : '',
+                        percent === 100 && incomeType.isFastCountdown() ? 'progress-bar-striped animate-progress' : '',
                         'shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center transition-all duration-50 ease-in'
                     )}
                 ></div>

@@ -53,7 +53,7 @@ export function PurchaseMultiplier() {
     return (
         <div>
             <label htmlFor="location" className="block text-sm font-medium text-gray-700">
-                Buy x number
+                Buy {state.purchaseMultiplier.value} number
             </label>
             <select
                 id="location"
