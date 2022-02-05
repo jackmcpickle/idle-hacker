@@ -1,9 +1,10 @@
+export const COLLECT_INCOME = 'COLLECT_INCOME';
+export const INCREASE_QTY = 'INCREASE_QTY';
+export const CHANGE_PURCHASE_MULTIPLIER = 'CHANGE_PURCHASE_MULTIPLIER';
 
-export const DEPOSIT = 'DEPOSIT';
-export const WITHDRAW = 'WITHDRAW';
-export const PAY = 'PAY'
-export const PAY_RISE = 'PAY_RISE'
-export const TAX = 'TAX'
-export const SPEND = 'SPEND'
-
-export const spendToGain = ({ cost, income }) => ({ type: SPEND, data: { cost, income } })
+export const increaseQty = (name: string, qty: number) => ({ type: INCREASE_QTY, data: { name, qty } });
+export const collectIncome = (name: number) => ({ type: COLLECT_INCOME, data: name });
+export const setPurchaseMultiplier = (value: string, isPercent: boolean) => ({
+    type: CHANGE_PURCHASE_MULTIPLIER,
+    data: { value, isPercent },
+});

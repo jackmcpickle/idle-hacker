@@ -1,6 +1,5 @@
-import React, { createContext, Dispatch, useContext, useReducer } from 'react';
+import { createContext, Dispatch, useContext, useMemo, useReducer } from 'react';
 import { IncomeAction, gameReducer, INITIAL_GAME_STATE } from '.';
-import { useTimer } from '../hooks/useTimer';
 
 type IncomeContextType = {
     state: typeof INITIAL_GAME_STATE;
@@ -9,10 +8,14 @@ type IncomeContextType = {
 
 const GlobalStateContext = createContext({} as IncomeContextType);
 
-export const GlobalStateProvider = ({ children }) => {
+export const GlobalStateProvider = (props) => {
     const [state, dispatch] = useReducer(gameReducer, INITIAL_GAME_STATE);
 
-    return <GlobalStateContext.Provider value={(state, dispatch)}>{children}</GlobalStateContext.Provider>;
+    const stateMemo = useMemo(() => {
+        return { state, dispatch };
+    }, [state, dispatch]);
+
+    return <GlobalStateContext.Provider value={stateMemo} {...props} />;
 };
 
 export const useGlobalStateProvider = () => useContext(GlobalStateContext);

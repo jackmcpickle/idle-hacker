@@ -1,23 +1,20 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import { useInterval } from 'react-use';
 
-export const INTERVAL = 50;
+export const INTERVAL = 100;
 
-export function useTimer(countDown: number) {
+export function useTimer(countDown: number, hasInventory: boolean) {
     const [time, setTime] = useState(0);
 
-    function tick() {
-        if (time < (countDown)) {
-            return setTime(time + INTERVAL);
-        }
-        setTime(0);
-    }
-
-    useEffect(() => {
-        const interval = setInterval(tick, INTERVAL);
-        return () => clearInterval(interval);
-    }, [time]);
+    useInterval(
+        () => {
+            time < countDown ? setTime(time + INTERVAL) : setTime(0);
+        },
+        hasInventory ? INTERVAL : null
+    );
 
     return {
-        time
-    }
+        time,
+        percent: (time / countDown) * 100,
+    };
 }

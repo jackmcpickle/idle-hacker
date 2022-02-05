@@ -1,22 +1,12 @@
-import * as React from 'react';
-
 export const Progress = ({ progress }) => {
-  return (
-    <div className="relative pt-1">
-      <div className="overflow-hidden h-2 text-xs flex rounded bg-purple-200">
-        <div
-          style={{ width: `${progress}%` }}
-          className="
-        shadow-none
-        flex flex-col
-        text-center
-        whitespace-nowrap
-        text-white
-        justify-center
-        bg-purple-500
-      "
-        ></div>
-      </div>
-    </div>
-  );
+    return (
+        <div className="relative pt-1">
+            <div className="flex h-2 overflow-hidden text-xs bg-purple-200 rounded">
+                <div
+                    style={{ width: `${progress}%` }}
+                    className="flex flex-col justify-center text-center text-white bg-purple-500 shadow-none  whitespace-nowrap"
+                ></div>
+            </div>
+        </div>
+    );
 };
