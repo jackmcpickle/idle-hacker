@@ -82,8 +82,8 @@ export class IncomeType {
 }
 
 export const INCOME_TYPES = [
-    new IncomeType({ name: 'Business Cards', cost: 10, income: 5, countdown: 2000, inventory: 1 }),
-    new IncomeType({ name: 'Resume Updates', cost: 20, income: 10, countdown: 5000 }),
-    new IncomeType({ name: 'Basic Website', cost: 100, income: 50, countdown: 10000 }),
-    new IncomeType({ name: 'E-commerce site', cost: 1000, income: 500, countdown: 20000 }),
+    new IncomeType({ name: 'Business Cards', cost: 10, income: 5, countdown: 5000, inventory: 1 }),
+    new IncomeType({ name: 'Resume Updates', cost: 50, income: 10, countdown: 10000 }),
+    new IncomeType({ name: 'Basic Website', cost: 100, income: 50, countdown: 60000 }),
+    new IncomeType({ name: 'E-commerce site', cost: 1000, income: 500, countdown: 120000 }),
 ];

@@ -1,23 +1,47 @@
-export const Header = () => {
+import { useGlobalStateProvider } from '@/state/context';
+import { TerminalIcon } from '@heroicons/react/solid';
+import { PurchaseMultiplier } from './PurchaseMultiplier';
+
+export function Header() {
+    const { state } = useGlobalStateProvider();
     return (
-        <header className="text-gray-600 body-font">
-            <div className="container flex flex-col flex-wrap items-center p-5 mx-auto md:flex-row">
-                <a className="flex items-center mb-4 font-medium text-gray-900 title-font md:mb-0">
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        className="w-10 h-10 p-2 text-white bg-red-500 rounded-full"
-                        viewBox="0 0 24 24"
-                    >
-                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
-                    </svg>
-                    <span className="ml-3 text-xl">Idle Hacker</span>
-                </a>
+        <div className="overflow-hidden bg-white rounded-lg shadow">
+            <h2 className="sr-only" id="profile-overview-title">
+                Idle Hacker
+            </h2>
+            <div className="p-6 bg-white">
+                <div className="sm:flex sm:items-center sm:justify-between">
+                    <div className="sm:flex sm:space-x-5">
+                        <div className="flex-shrink-0">
+                            <TerminalIcon className="w-16 h-16 text-lime-900" />
+                        </div>
+                        <div className="mt-4 text-center sm:mt-0 sm:pt-1 sm:text-left">
+                            <p className="text-sm font-medium text-gray-600">Hack the things</p>
+                            <p className="text-xl font-bold text-gray-900 sm:text-2xl">Idle Hacker</p>
+                            <p className="text-sm font-medium text-gray-600">
+                                Collect and level up gear to earn and hack
+                            </p>
+                        </div>
+                    </div>
+                    <div className="flex justify-center mt-5 sm:mt-0">
+                        <PurchaseMultiplier />
+                    </div>
+                </div>
             </div>
-        </header>
+            <div className="grid grid-cols-1 border-t border-gray-200 divide-y divide-gray-200 bg-gray-50 sm:grid-cols-3 sm:divide-y-0 sm:divide-x">
+                <div className="px-6 py-5 text-sm font-medium text-center">
+                    <span className="text-gray-900">Income:</span> <span className="text-gray-600">${state.bank}</span>
+                </div>
+                <div className="px-6 py-5 text-sm font-medium text-center">
+                    <span className="text-gray-900">Items:</span>{' '}
+                    <span className="text-gray-600">
+                        {state.incomeTypes.reduce((sum, i) => sum + i.getInventory(), 0)}
+                    </span>
+                </div>
+                <div className="px-6 py-5 text-sm font-medium text-center">
+                    <span className="text-gray-900">Income:</span> <span className="text-gray-600">${state.bank}</span>
+                </div>
+            </div>
+        </div>
     );
-};
+}

@@ -51,15 +51,15 @@ export function PurchaseMultiplier() {
     }, []);
 
     return (
-        <div>
-            <label htmlFor="location" className="block text-sm font-medium text-gray-700">
-                Buy {state.purchaseMultiplier.value} number
+        <div className='flex items-center'>
+            <label htmlFor="location" className="block mx-2 text-sm font-medium text-gray-700">
+                Buy
             </label>
             <select
                 id="location"
                 name="location"
                 onChange={handleChange}
-                className="block w-full py-2 pl-3 pr-10 mt-1 text-base border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                className="block w-full py-2 pl-3 pr-10 mt-1 text-base border-gray-300 rounded-md focus:outline-none focus:ring-lime-500 focus:border-lime-500 sm:text-sm"
                 value={state.purchaseMultiplier.value}
             >
                 {options.map((o) => (

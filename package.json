@@ -21,6 +21,8 @@
         "vite-tsconfig-paths": "^3.3.17"
     },
     "dependencies": {
+        "@headlessui/react": "^1.4.3",
+        "@heroicons/react": "^1.0.5",
         "@tailwindcss/forms": "^0.4.0",
         "@typescript-eslint/eslint-plugin": "^5.9.0",
         "@typescript-eslint/parser": "^5.9.0",
