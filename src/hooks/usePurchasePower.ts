@@ -1,6 +1,5 @@
-import { IncomeType } from '@/models/incomes';
+import { IncomeType } from '@/models/IncomeType';
 import { useGlobalStateProvider } from '@/state/context';
-import { roundHigh } from '@/utils/round';
 import { useMemo } from 'react';
 
 export const usePurchasePower = (incomeType: IncomeType) => {
@@ -16,6 +15,6 @@ export const usePurchasePower = (incomeType: IncomeType) => {
 
     return {
         canAfford,
-        purchaseQty: roundHigh(purchaseQty),
+        purchaseQty: purchaseQty,
     };
 };

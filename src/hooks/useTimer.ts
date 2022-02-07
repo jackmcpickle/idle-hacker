@@ -1,4 +1,4 @@
-import { IncomeType } from '@/models/incomes';
+import { IncomeType } from '@/models/IncomeType';
 import { collectIncome } from '@/state/actions';
 import { useGlobalStateProvider } from '@/state/context';
 import { useEffect, useState } from 'react';
@@ -19,7 +19,7 @@ export function useTimer(incomeType: IncomeType) {
 
     useEffect(() => {
         if (time >= incomeType.getCountdown()) {
-            dispatch(collectIncome(incomeType.getIncome()));
+            dispatch(collectIncome(incomeType.getIncome().real()));
         }
     }, [incomeType, time]);
 

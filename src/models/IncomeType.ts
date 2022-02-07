@@ -1,5 +1,5 @@
-import { roundHigh } from '@/utils/round';
 import { levelMultiplier } from './levels';
+import { NumberUnit } from './NumberUnit';
 
 interface IncomeConstructor {
     name: string;
@@ -9,6 +9,8 @@ interface IncomeConstructor {
     timeMultiplier?: number;
     inventory?: number;
     incomeMultiplier?: number;
+    unlockIncome?: number;
+    icon: string;
 }
 
 export class IncomeType {
@@ -19,6 +21,8 @@ export class IncomeType {
     inventory: number;
     timeMultiplier: number;
     incomeMultiplier: number;
+    unlockIncome: number;
+    icon: string;
 
     constructor({
         name,
@@ -28,6 +32,8 @@ export class IncomeType {
         inventory = 0,
         timeMultiplier = 1,
         incomeMultiplier = 1,
+        unlockIncome = 0,
+        icon,
     }: IncomeConstructor) {
         this.name = name;
         this.cost = cost;
@@ -36,12 +42,22 @@ export class IncomeType {
         this.inventory = inventory;
         this.timeMultiplier = timeMultiplier;
         this.incomeMultiplier = incomeMultiplier;
+        this.unlockIncome = unlockIncome;
+        this.icon = icon;
+    }
+
+    getIcon() {
+        return this.icon;
+    }
+
+    isUnlocked(value) {
+        return this.unlockIncome <= value;
     }
 
     addInventory(value: number) {
         this.inventory += value;
         const level = levelMultiplier.find((level) => level.qty <= this.inventory);
-        console.log({level});
+        console.log({ level });
         if (level) {
             this.timeMultiplier = level.speed;
             this.incomeMultiplier = level.income;
@@ -49,7 +65,7 @@ export class IncomeType {
     }
 
     getValue() {
-        return roundHigh(Math.round(this.income * this.incomeMultiplier));
+        return new NumberUnit(this.income * this.incomeMultiplier);
     }
 
     getInventory() {
@@ -73,17 +89,10 @@ export class IncomeType {
     }
 
     getIncome() {
-        return roundHigh(Math.round(this.inventory * this.income * this.incomeMultiplier));
+        return new NumberUnit(this.inventory * this.income * this.incomeMultiplier);
     }
 
     hasInventory() {
         return this.inventory > 0;
     }
 }
-
-export const INCOME_TYPES = [
-    new IncomeType({ name: 'Business Cards', cost: 10, income: 5, countdown: 5000, inventory: 1 }),
-    new IncomeType({ name: 'Resume Updates', cost: 50, income: 10, countdown: 10000 }),
-    new IncomeType({ name: 'Basic Website', cost: 100, income: 50, countdown: 60000 }),
-    new IncomeType({ name: 'E-commerce site', cost: 1000, income: 500, countdown: 120000 }),
-];

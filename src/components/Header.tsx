@@ -1,9 +1,13 @@
 import { useGlobalStateProvider } from '@/state/context';
+import { displayHigh } from '@/utils/displayHigh';
 import { TerminalIcon } from '@heroicons/react/solid';
 import { PurchaseMultiplier } from './PurchaseMultiplier';
 
 export function Header() {
     const { state } = useGlobalStateProvider();
+    const totalIncomeOverTime = displayHigh(state.incomeTypes
+        .filter((i) => i.hasInventory())
+        .reduce((sum, i) => sum + (i.getIncome().real() / i.getCountdown()) * 1000, 0))
     return (
         <div className="overflow-hidden bg-white rounded-lg shadow">
             <h2 className="sr-only" id="profile-overview-title">
@@ -30,16 +34,18 @@ export function Header() {
             </div>
             <div className="grid grid-cols-1 border-t border-gray-200 divide-y divide-gray-200 bg-gray-50 sm:grid-cols-3 sm:divide-y-0 sm:divide-x">
                 <div className="px-6 py-5 text-sm font-medium text-center">
-                    <span className="text-gray-900">Income:</span> <span className="text-gray-600">${state.bank}</span>
+                    <span className="text-gray-900">Bank: </span>
+                    <span className="text-gray-600">${displayHigh(state.bank)}</span>
                 </div>
                 <div className="px-6 py-5 text-sm font-medium text-center">
-                    <span className="text-gray-900">Items:</span>{' '}
+                    <span className="text-gray-900">Items: </span>
                     <span className="text-gray-600">
                         {state.incomeTypes.reduce((sum, i) => sum + i.getInventory(), 0)}
                     </span>
                 </div>
                 <div className="px-6 py-5 text-sm font-medium text-center">
-                    <span className="text-gray-900">Income:</span> <span className="text-gray-600">${state.bank}</span>
+                    <span className="text-gray-900">Avg Income: </span>
+                    <span className="text-gray-600">${totalIncomeOverTime} / 1 sec</span>
                 </div>
             </div>
         </div>

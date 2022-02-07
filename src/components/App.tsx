@@ -1,7 +1,7 @@
 import React from 'react';
 import { GlobalStateProvider } from '@/state/context';
 import { Header } from '@/components/Header';
-import { Income } from '@/components/Income';
+import { IncomeList } from '@/components/IncomeList';
 
 export const App = () => {
     return (
@@ -10,7 +10,7 @@ export const App = () => {
                 <Header />
                 <section className="text-gray-600 body-font">
                     <div className="container px-5 py-24 mx-auto">
-                        <Income />
+                        <IncomeList />
                     </div>
                 </section>
             </GlobalStateProvider>
