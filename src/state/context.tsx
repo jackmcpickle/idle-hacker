@@ -1,6 +1,7 @@
 import {
     createContext,
     Dispatch,
+    ReactNode,
     useContext,
     useMemo,
     useReducer,
@@ -14,7 +15,7 @@ type IncomeContextType = {
 
 const GlobalStateContext = createContext({} as IncomeContextType);
 
-export const GlobalStateProvider = (props) => {
+export const GlobalStateProvider = ({ children }: { children: ReactNode }) => {
     const [state, dispatch] = useReducer(gameReducer, INITIAL_GAME_STATE);
 
     const stateMemo = useMemo(() => {
@@ -22,10 +23,9 @@ export const GlobalStateProvider = (props) => {
     }, [state, dispatch]);
 
     return (
-        <GlobalStateContext.Provider
-            value={stateMemo}
-            {...props}
-        />
+        <GlobalStateContext.Provider value={stateMemo}>
+            {children}
+        </GlobalStateContext.Provider>
     );
 };
 

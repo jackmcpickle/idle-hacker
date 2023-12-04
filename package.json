@@ -1,7 +1,7 @@
 {
     "name": "idle-hacker",
     "version": "1.0.0",
-    "description": "",
+    "private": true,
     "main": "index.js",
     "scripts": {
         "dev": "vite",
@@ -30,6 +30,7 @@
         "@typescript-eslint/eslint-plugin": "^6.13.1",
         "@typescript-eslint/parser": "^6.13.1",
         "@vitejs/plugin-react": "^4.2.0",
+        "clsx": "^2.0.0",
         "date-fns": "^2.30.0",
         "eslint": "^8.55.0",
         "eslint-config-prettier": "^8.10.0",

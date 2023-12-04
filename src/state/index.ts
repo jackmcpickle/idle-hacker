@@ -76,6 +76,7 @@ export const gameReducer = (
             const incomeType = state.incomeTypes.find(
                 (type) => type.name === data.name
             );
+            if (!incomeType) return state;
             incomeType.addInventory(data.qty);
             const cost = incomeType.getCost() * data.qty;
             return {

@@ -58,7 +58,7 @@ export class IncomeType {
         return this.icon;
     }
 
-    isUnlocked(value) {
+    isUnlocked(value: number) {
         return this.unlockIncome <= value;
     }
 

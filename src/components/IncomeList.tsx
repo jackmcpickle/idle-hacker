@@ -1,7 +1,7 @@
 import { useGlobalStateProvider } from '@/state/context';
 import { ButtonTimer } from '@/components/ButtonTimer';
 import { ProgressBar } from './ProgressBar';
-import { classNames } from '@/utils/classNames';
+import { clsx } from 'clsx';
 
 export const IncomeList = () => {
     const { state } = useGlobalStateProvider();
@@ -15,7 +15,7 @@ export const IncomeList = () => {
                 key={index}
             >
                 <div
-                    className={classNames(
+                    className={clsx(
                         active
                             ? 'bg-white shadow-sm'
                             : 'bg-gray-200 border-gray-400 border-dashed',
@@ -23,7 +23,7 @@ export const IncomeList = () => {
                     )}
                 >
                     <div
-                        className={classNames(
+                        className={clsx(
                             active ? '' : 'hidden',
                             'absolute p-4 -ml-8 bg-white rounded-full left-1/2 -top-8'
                         )}

@@ -1,4 +1,4 @@
-export const Progress = ({ progress }) => {
+export const Progress = ({ progress }: { progress: number }) => {
     return (
         <div className="relative pt-1">
             <div className="flex h-2 overflow-hidden text-xs bg-purple-200 rounded">
