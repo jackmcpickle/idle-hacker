@@ -7,11 +7,18 @@ export const usePurchasePower = (incomeType: IncomeType) => {
 
     const purchaseQty = useMemo((): number => {
         return state.purchaseMultiplier.isPercent
-            ? Math.floor((state.bank * (parseInt(state.purchaseMultiplier.value, 10) / 100)) / incomeType.getCost())
+            ? Math.floor(
+                  (state.bank *
+                      (parseInt(state.purchaseMultiplier.value, 10) / 100)) /
+                      incomeType.getCost()
+              )
             : parseInt(state.purchaseMultiplier.value, 10);
     }, [state, incomeType]);
 
-    const canAfford = useMemo(() => state.bank >= incomeType.getCost() * purchaseQty, [purchaseQty, state, incomeType]);
+    const canAfford = useMemo(
+        () => state.bank >= incomeType.getCost() * purchaseQty,
+        [purchaseQty, state, incomeType]
+    );
 
     return {
         canAfford,

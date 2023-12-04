@@ -1,5 +1,13 @@
+import { ForwardRefExoticComponent, RefAttributes, SVGProps } from 'react';
 import { levelMultiplier } from './levels';
 import { NumberUnit } from './NumberUnit';
+
+export type IconComponent = ForwardRefExoticComponent<
+    Omit<SVGProps<SVGSVGElement>, 'ref'> & {
+        title?: string;
+        titleId?: string;
+    } & RefAttributes<SVGSVGElement>
+>;
 
 interface IncomeConstructor {
     name: string;
@@ -10,7 +18,7 @@ interface IncomeConstructor {
     inventory?: number;
     incomeMultiplier?: number;
     unlockIncome?: number;
-    icon: string;
+    icon: IconComponent;
 }
 
 export class IncomeType {
@@ -22,7 +30,7 @@ export class IncomeType {
     timeMultiplier: number;
     incomeMultiplier: number;
     unlockIncome: number;
-    icon: string;
+    icon: IconComponent;
 
     constructor({
         name,
@@ -56,7 +64,9 @@ export class IncomeType {
 
     addInventory(value: number) {
         this.inventory += value;
-        const level = levelMultiplier.find((level) => level.qty <= this.inventory);
+        const level = levelMultiplier.find(
+            (level) => level.qty <= this.inventory
+        );
         console.log({ level });
         if (level) {
             this.timeMultiplier = level.speed;
@@ -89,7 +99,9 @@ export class IncomeType {
     }
 
     getIncome() {
-        return new NumberUnit(this.inventory * this.income * this.incomeMultiplier);
+        return new NumberUnit(
+            this.inventory * this.income * this.incomeMultiplier
+        );
     }
 
     hasInventory() {

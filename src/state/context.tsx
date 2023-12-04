@@ -1,4 +1,10 @@
-import { createContext, Dispatch, useContext, useMemo, useReducer } from 'react';
+import {
+    createContext,
+    Dispatch,
+    useContext,
+    useMemo,
+    useReducer,
+} from 'react';
 import { IncomeAction, gameReducer, INITIAL_GAME_STATE } from '.';
 
 type IncomeContextType = {
@@ -15,7 +21,12 @@ export const GlobalStateProvider = (props) => {
         return { state, dispatch };
     }, [state, dispatch]);
 
-    return <GlobalStateContext.Provider value={stateMemo} {...props} />;
+    return (
+        <GlobalStateContext.Provider
+            value={stateMemo}
+            {...props}
+        />
+    );
 };
 
 export const useGlobalStateProvider = () => useContext(GlobalStateContext);

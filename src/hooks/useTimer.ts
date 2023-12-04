@@ -12,7 +12,9 @@ export function useTimer(incomeType: IncomeType) {
 
     useInterval(
         () => {
-            time < incomeType.getCountdown() ? setTime(time + INTERVAL) : setTime(0);
+            time < incomeType.getCountdown()
+                ? setTime(time + INTERVAL)
+                : setTime(0);
         },
         incomeType.hasInventory() ? INTERVAL : null
     );
@@ -26,6 +28,8 @@ export function useTimer(incomeType: IncomeType) {
     return {
         time,
         // if under 1sec just show at 100%
-        percent: incomeType.isFastCountdown() ? 100 : (time / incomeType.getCountdown()) * 100,
+        percent: incomeType.isFastCountdown()
+            ? 100
+            : (time / incomeType.getCountdown()) * 100,
     };
 }

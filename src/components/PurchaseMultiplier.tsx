@@ -51,8 +51,11 @@ export function PurchaseMultiplier() {
     }, []);
 
     return (
-        <div className='flex items-center'>
-            <label htmlFor="location" className="block mx-2 text-sm font-medium text-gray-700">
+        <div className="flex items-center">
+            <label
+                htmlFor="location"
+                className="block mx-2 text-sm font-medium text-gray-700"
+            >
                 Buy
             </label>
             <select
@@ -63,7 +66,10 @@ export function PurchaseMultiplier() {
                 value={state.purchaseMultiplier.value}
             >
                 {options.map((o) => (
-                    <option key={o.value} value={o.value}>
+                    <option
+                        key={o.value}
+                        value={o.value}
+                    >
                         {o.label}
                     </option>
                 ))}
