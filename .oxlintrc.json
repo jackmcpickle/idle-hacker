@@ -55,8 +55,6 @@
         "perf": "warn",
         "restriction": "warn",
         "correctness": "error",
-        "suspicious": "warn",
-        "pedantic": "warn"
     },
     "plugins": [
         "eslint",
@@ -67,26 +65,10 @@
         "react-perf"
     ],
     "ignorePatterns": [
-        ".venv/",
         "node_modules/",
         "build/",
         "dist/",
-        ".ruff_cache/",
-        "static/",
         "tailwind.config.js",
-        "postcss.config.mjs",
         "vite.config.ts",
-        "webpack.config.cjs"
-    ],
-    "overrides": [
-        {
-            "files": ["*.stories.*"],
-            "rules": {
-                "no-console": "off",
-                "import/no-default-export": "off",
-                "typescript/explicit-module-boundary-types": "off",
-                "react-perf/jsx-no-jsx-as-prop": "off"
-            }
-        }
     ]
 }
