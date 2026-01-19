@@ -26,4 +26,9 @@ api.get('/health', (c) => c.json({ status: 'ok' }));
 const app = new Hono<AppEnv>();
 app.route('/api', api);
 
+// Serve static assets - handled by @cloudflare/vite-plugin
+app.get('*', (c) => {
+    return c.env.ASSETS.fetch(c.req.raw);
+});
+
 export default app;

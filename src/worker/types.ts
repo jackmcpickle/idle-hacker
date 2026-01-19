@@ -5,6 +5,7 @@ export type Bindings = {
     TURSO_AUTH_TOKEN: string;
     RESEND_API_KEY: string;
     SESSION_SECRET: string;
+    ASSETS: Fetcher;
 };
 
 export type Variables = {
