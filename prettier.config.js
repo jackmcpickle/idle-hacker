@@ -16,9 +16,7 @@ export default {
     endOfLine: 'lf',
     trailingComma: 'all',
     tabWidth: 4,
-    plugins: [
-        'prettier-plugin-tailwindcss',
-    ],
+    plugins: ['prettier-plugin-tailwindcss'],
     tailwindAttributes: ['classList', 'className'],
     tailwindFunctions: ['cn', 'clsx', 'cva', 'cx'],
 };

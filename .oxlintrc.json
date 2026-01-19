@@ -54,7 +54,7 @@
     "categories": {
         "perf": "warn",
         "restriction": "warn",
-        "correctness": "error",
+        "correctness": "error"
     },
     "plugins": [
         "eslint",
@@ -69,6 +69,6 @@
         "build/",
         "dist/",
         "tailwind.config.js",
-        "vite.config.ts",
+        "vite.config.ts"
     ]
 }

@@ -41,16 +41,19 @@ pnpm routes-gen   # regenerate route tree
 ## Architecture
 
 **State**: React Context + useReducer in `src/state/`
+
 - `context.tsx` - GlobalStateContext provider
 - `actions.ts` - action constants
 - `index.ts` - reducer + initial state
 
 **Game Models**: Class-based in `src/models/`
+
 - `IncomeType` - income sources with multipliers, cooldowns, inventory
 - `NumberUnit` - large number formatting
 - `levels.ts` - multiplier tiers
 
 **Routing**: TanStack Router file-based
+
 - Routes in `src/routes/`
 - `routeTree.gen.ts` auto-generated (don't edit)
 
