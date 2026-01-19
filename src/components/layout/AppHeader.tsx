@@ -31,7 +31,8 @@ export function AppHeader(): ReactElement {
         }, 0);
 
     const totalFlow = incomePerSec + debitPerSec;
-    const incomePercent = totalFlow > 0 ? (incomePerSec / totalFlow) * 100 : 100;
+    const incomePercent =
+        totalFlow > 0 ? (incomePerSec / totalFlow) * 100 : 100;
     const netPerSec = incomePerSec - debitPerSec;
 
     return (

@@ -11,6 +11,7 @@ export const LOAD_STATE = 'LOAD_STATE';
 export const SET_LAST_SYNCED = 'SET_LAST_SYNCED';
 export const GAME_TICK = 'GAME_TICK';
 export const APPLY_OFFLINE_PROGRESS = 'APPLY_OFFLINE_PROGRESS';
+export const RESET_GAME = 'RESET_GAME';
 
 export const increaseQty = (
     name: string,
@@ -93,4 +94,8 @@ export const applyOfflineProgress = (
 ): { type: typeof APPLY_OFFLINE_PROGRESS; data: OfflineProgressData } => ({
     type: APPLY_OFFLINE_PROGRESS,
     data,
+});
+
+export const resetGame = (): { type: typeof RESET_GAME } => ({
+    type: RESET_GAME,
 });

@@ -3,6 +3,9 @@ import { useState } from 'react';
 import { useSettings } from '@/contexts/SettingsContext';
 import { useGameSyncContext } from '@/contexts/GameSyncContext';
 import { useGlobalStateProvider } from '@/state/context';
+import { resetGame } from '@/state/actions';
+import { saveToLocalStorage } from '@/state/serialize';
+import { INITIAL_GAME_STATE } from '@/state';
 import { Button } from '@/components/ui/Button';
 import {
     Sun,
@@ -34,7 +37,7 @@ function SettingsPage(): ReactElement {
         numberFormat,
         setNumberFormat,
     } = useSettings();
-    const { state } = useGlobalStateProvider();
+    const { state, dispatch } = useGlobalStateProvider();
     const { sync } = useGameSyncContext();
     const [isSyncing, setIsSyncing] = useState(false);
 
@@ -61,8 +64,8 @@ function SettingsPage(): ReactElement {
     function handleReset(): void {
         // eslint-disable-next-line no-alert
         if (window.confirm('Reset all progress? This cannot be undone.')) {
-            localStorage.removeItem('idle-hacker-state');
-            window.location.reload();
+            dispatch(resetGame());
+            saveToLocalStorage(INITIAL_GAME_STATE);
         }
     }
 

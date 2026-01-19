@@ -1,8 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useGlobalStateProvider } from '@/state/context';
 import { Button } from '@/components/ui/Button';
-import { User, LogOut, Save, Loader2 } from 'lucide-react';
+import { displayHigh } from '@/utils/displayHigh';
+import { User, LogOut, Save, Loader2, BarChart3 } from 'lucide-react';
 import type { ReactElement } from 'react';
 
 export const Route = createFileRoute('/_app/account')({
@@ -11,10 +13,20 @@ export const Route = createFileRoute('/_app/account')({
 
 function AccountPage(): ReactElement {
     const { user, isAuthenticated, logout } = useAuth();
+    const { state } = useGlobalStateProvider();
     const [publicName, setPublicName] = useState(user?.publicName ?? '');
     const [hackerAlias, setHackerAlias] = useState(user?.hackerAlias ?? '');
     const [saving, setSaving] = useState(false);
     const [saved, setSaved] = useState(false);
+
+    const totalIncomeSources = state.incomeTypes.reduce(
+        (sum, income) => sum + income.inventory,
+        0,
+    );
+    const totalHardwareLevels = state.hardware.reduce(
+        (sum, hw) => sum + hw.level,
+        0,
+    );
 
     async function handleSave(): Promise<void> {
         setSaving(true);
@@ -123,6 +135,55 @@ function AccountPage(): ReactElement {
                             </>
                         )}
                     </Button>
+                </div>
+            </section>
+
+            <section className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800">
+                <div className="mb-4 flex items-center gap-2">
+                    <BarChart3 className="h-5 w-5 text-lime-600 dark:text-lime-400" />
+                    <h2 className="font-semibold">Stats</h2>
+                </div>
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                    <div className="rounded-md bg-gray-50 p-2 dark:bg-gray-700/50">
+                        <div className="text-gray-500 dark:text-gray-400">
+                            Hacks Completed
+                        </div>
+                        <div className="font-semibold">
+                            {state.totalHacksCompleted}
+                        </div>
+                    </div>
+                    <div className="rounded-md bg-gray-50 p-2 dark:bg-gray-700/50">
+                        <div className="text-gray-500 dark:text-gray-400">
+                            Income Sources
+                        </div>
+                        <div className="font-semibold">
+                            {totalIncomeSources}
+                        </div>
+                    </div>
+                    <div className="rounded-md bg-gray-50 p-2 dark:bg-gray-700/50">
+                        <div className="text-gray-500 dark:text-gray-400">
+                            Hardware Upgrades
+                        </div>
+                        <div className="font-semibold">
+                            {totalHardwareLevels}
+                        </div>
+                    </div>
+                    <div className="rounded-md bg-gray-50 p-2 dark:bg-gray-700/50">
+                        <div className="text-gray-500 dark:text-gray-400">
+                            Total Earned
+                        </div>
+                        <div className="font-semibold text-green-600 dark:text-green-400">
+                            ${displayHigh(state.totalEarned)}
+                        </div>
+                    </div>
+                    <div className="col-span-2 rounded-md bg-gray-50 p-2 dark:bg-gray-700/50">
+                        <div className="text-gray-500 dark:text-gray-400">
+                            Total Spent
+                        </div>
+                        <div className="font-semibold text-red-600 dark:text-red-400">
+                            ${displayHigh(state.totalSpent)}
+                        </div>
+                    </div>
                 </div>
             </section>
 

@@ -19,7 +19,7 @@ describe('serialize', () => {
                 value: '1',
                 isPercent: false,
             });
-            expect(result.incomeTypes).toHaveLength(4);
+            expect(result.incomeTypes).toHaveLength(8);
             expect(result.hardware).toHaveLength(5);
             expect(result.activeHacks).toEqual([null]);
             expect(result.maxHackSlots).toBe(1);
@@ -75,8 +75,14 @@ describe('serialize', () => {
 
             const result = deserializeState(serialized);
             expect(result).not.toBeNull();
-            expect(result?.incomeTypes[0].inventory).toBe(10);
-            expect(result?.incomeTypes[1].inventory).toBe(5);
+            const businessCards = result?.incomeTypes.find(
+                (i) => i.name === 'Business Cards',
+            );
+            const resumeUpdates = result?.incomeTypes.find(
+                (i) => i.name === 'Resume Updates',
+            );
+            expect(businessCards?.inventory).toBe(10);
+            expect(resumeUpdates?.inventory).toBe(5);
         });
 
         it('restores hardware levels', () => {

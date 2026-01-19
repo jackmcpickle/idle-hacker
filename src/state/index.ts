@@ -16,9 +16,19 @@ import {
     SET_LAST_SYNCED,
     GAME_TICK,
     APPLY_OFFLINE_PROGRESS,
+    RESET_GAME,
     type OfflineProgressData,
 } from '@/state/actions';
-import { CircleDollarSign, CreditCard, FileText, Globe } from 'lucide-react';
+import {
+    Briefcase,
+    Bug,
+    CircleDollarSign,
+    Cloud,
+    CreditCard,
+    FileText,
+    Globe,
+    Users,
+} from 'lucide-react';
 
 export type CompletedHack = {
     jobName: string;
@@ -30,6 +40,8 @@ export type GameContext = {
     bank: number;
     influence: number;
     totalEarned: number;
+    totalSpent: number;
+    totalHacksCompleted: number;
     purchaseMultiplier: { value: string; isPercent: boolean };
     incomeTypes: IncomeType[];
     hardware: HardwareItem[];
@@ -91,6 +103,10 @@ type ApplyOfflineProgressAction = {
     data: OfflineProgressData;
 };
 
+type ResetGameAction = {
+    type: typeof RESET_GAME;
+};
+
 export type GameAction =
     | CollectIncomeAction
     | IncreaseQtyAction
@@ -101,7 +117,8 @@ export type GameAction =
     | LoadStateAction
     | SetLastSyncedAction
     | GameTickAction
-    | ApplyOfflineProgressAction;
+    | ApplyOfflineProgressAction
+    | ResetGameAction;
 
 export const INCOME_TYPES = [
     new IncomeType({
@@ -114,28 +131,60 @@ export const INCOME_TYPES = [
         icon: CreditCard,
     }),
     new IncomeType({
+        name: 'Freelance Tasks',
+        cost: 30,
+        income: 8,
+        countdown: 6000,
+        unlockIncome: 500,
+        icon: Briefcase,
+    }),
+    new IncomeType({
         name: 'Resume Updates',
-        cost: 50,
-        income: 10,
-        countdown: 10000,
-        unlockIncome: 1000,
+        cost: 80,
+        income: 15,
+        countdown: 8000,
+        unlockIncome: 2000,
         icon: FileText,
     }),
     new IncomeType({
+        name: 'Bug Bounties',
+        cost: 200,
+        income: 40,
+        countdown: 15000,
+        unlockIncome: 10000,
+        icon: Bug,
+    }),
+    new IncomeType({
         name: 'Basic Website',
-        cost: 100,
-        income: 50,
-        countdown: 60000,
-        unlockIncome: 100000,
+        cost: 600,
+        income: 100,
+        countdown: 30000,
+        unlockIncome: 50000,
         icon: Globe,
     }),
     new IncomeType({
-        name: 'E-commerce site',
-        cost: 1000,
-        income: 500,
-        countdown: 120000,
-        unlockIncome: 10000000,
+        name: 'Consulting',
+        cost: 2000,
+        income: 350,
+        countdown: 45000,
+        unlockIncome: 250000,
+        icon: Users,
+    }),
+    new IncomeType({
+        name: 'E-commerce Site',
+        cost: 8000,
+        income: 1200,
+        countdown: 60000,
+        unlockIncome: 1500000,
         icon: CircleDollarSign,
+    }),
+    new IncomeType({
+        name: 'SaaS Platform',
+        cost: 30000,
+        income: 5000,
+        countdown: 90000,
+        unlockIncome: 10000000,
+        icon: Cloud,
     }),
 ];
 
@@ -144,6 +193,8 @@ export const INITIAL_GAME_STATE: GameContext = {
     bank: 0,
     influence: 0,
     totalEarned: 0,
+    totalSpent: 0,
+    totalHacksCompleted: 0,
     purchaseMultiplier: {
         value: '1',
         isPercent: false,
@@ -186,6 +237,7 @@ export const gameReducer = (
             return {
                 ...state,
                 bank: state.bank - cost,
+                totalSpent: state.totalSpent + cost,
                 incomeTypes: [...state.incomeTypes],
             };
         }
@@ -209,6 +261,7 @@ export const gameReducer = (
             return {
                 ...state,
                 bank: state.bank - cost,
+                totalSpent: state.totalSpent + cost,
                 hardware: newHardware,
                 maxHackSlots: newMaxSlots,
                 activeHacks: newActiveHacks,
@@ -248,6 +301,7 @@ export const gameReducer = (
             return {
                 ...state,
                 influence: state.influence + job.influenceReward,
+                totalHacksCompleted: state.totalHacksCompleted + 1,
                 activeHacks: newActiveHacks,
             };
         }
@@ -266,6 +320,8 @@ export const gameReducer = (
             const { now } = action.data;
             let newBank = state.bank;
             let newTotalEarned = state.totalEarned;
+            let newTotalSpent = state.totalSpent;
+            let newTotalHacksCompleted = state.totalHacksCompleted;
             let newInfluence = state.influence;
             const newIncomeTimers = { ...state.incomeTimers };
             const newActiveHacks = [...state.activeHacks];
@@ -312,11 +368,14 @@ export const gameReducer = (
                 // Check if hack is complete
                 if (now >= hack.endsAt) {
                     // Drain remaining cost
-                    const remainingCost = job.getTotalCost() - hack.totalCostPaid;
+                    const remainingCost =
+                        job.getTotalCost() - hack.totalCostPaid;
                     if (remainingCost > 0 && newBank >= remainingCost) {
                         newBank -= remainingCost;
+                        newTotalSpent += remainingCost;
                     }
                     newInfluence += job.influenceReward;
+                    newTotalHacksCompleted += 1;
                     completedHacks.push({
                         jobName: job.name,
                         influenceReward: job.influenceReward,
@@ -331,6 +390,7 @@ export const gameReducer = (
 
                     if (actualCost > 0) {
                         newBank -= actualCost;
+                        newTotalSpent += actualCost;
                         newActiveHacks[slot] = {
                             ...hack,
                             totalCostPaid: hack.totalCostPaid + actualCost,
@@ -364,6 +424,8 @@ export const gameReducer = (
                 ...state,
                 bank: newBank,
                 totalEarned: newTotalEarned,
+                totalSpent: newTotalSpent,
+                totalHacksCompleted: newTotalHacksCompleted,
                 influence: newInfluence,
                 activeHacks: newActiveHacks,
                 globalTick: now,
@@ -387,9 +449,15 @@ export const gameReducer = (
                 ...state,
                 bank: state.bank + netEarnings,
                 totalEarned: state.totalEarned + earnedWhileAway,
+                totalSpent: state.totalSpent + hackCostsPaid,
+                totalHacksCompleted:
+                    state.totalHacksCompleted + completedActiveHackSlots.length,
                 influence: state.influence + influenceEarned,
                 activeHacks: newActiveHacks,
             };
+        }
+        case RESET_GAME: {
+            return INITIAL_GAME_STATE;
         }
         default:
             return state;

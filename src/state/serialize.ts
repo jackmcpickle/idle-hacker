@@ -8,6 +8,8 @@ type SerializedState = {
     bank: number;
     influence: number;
     totalEarned: number;
+    totalSpent: number;
+    totalHacksCompleted: number;
     purchaseMultiplier: { value: string; isPercent: boolean };
     incomeTypes: Array<{
         name: string;
@@ -30,6 +32,8 @@ export function serializeState(state: GameContext): SerializedState {
         bank: state.bank,
         influence: state.influence,
         totalEarned: state.totalEarned,
+        totalSpent: state.totalSpent,
+        totalHacksCompleted: state.totalHacksCompleted,
         purchaseMultiplier: state.purchaseMultiplier,
         incomeTypes: state.incomeTypes.map((inc) => ({
             name: inc.name,
@@ -93,6 +97,8 @@ export function deserializeState(data: unknown): GameContext | null {
         bank: saved.bank ?? 0,
         influence: saved.influence ?? 0,
         totalEarned: saved.totalEarned ?? 0,
+        totalSpent: saved.totalSpent ?? 0,
+        totalHacksCompleted: saved.totalHacksCompleted ?? 0,
         purchaseMultiplier: saved.purchaseMultiplier ?? {
             value: '1',
             isPercent: false,
