@@ -62,7 +62,7 @@ export function PurchaseMultiplier() {
                 id="location"
                 name="location"
                 onChange={handleChange}
-                className="mt-1 block w-full rounded-md border-gray-300 py-2 pr-10 pl-3 text-base focus:border-lime-500 focus:ring-lime-500 focus:outline-none sm:text-sm"
+                className="mt-1 block w-full rounded-md border-gray-300 py-2 pr-10 pl-3 text-base focus:border-lime-500 focus:ring-lime-500 focus:outline-hidden sm:text-sm"
                 value={state.purchaseMultiplier.value}
             >
                 {options.map((o) => (

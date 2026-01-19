@@ -15,7 +15,7 @@ export function Header() {
             ),
     );
     return (
-        <div className="overflow-hidden rounded-lg bg-white shadow">
+        <div className="overflow-hidden rounded-lg bg-white shadow-sm">
             <h2
                 className="sr-only"
                 id="profile-overview-title"
@@ -25,7 +25,7 @@ export function Header() {
             <div className="bg-white p-6">
                 <div className="sm:flex sm:items-center sm:justify-between">
                     <div className="sm:flex sm:space-x-5">
-                        <div className="flex-shrink-0">
+                        <div className="shrink-0">
                             <CommandLineIcon className="h-16 w-16 text-lime-900" />
                         </div>
                         <div className="mt-4 text-center sm:mt-0 sm:pt-1 sm:text-left">

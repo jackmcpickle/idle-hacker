@@ -13,13 +13,13 @@ export function ProgressBar({ incomeType }: ProgressBarProps): ReactElement {
     const { percent } = useTimer(incomeType);
 
     return (
-        <div className="relative z-0 inline-flex w-full items-stretch rounded-md shadow-sm">
+        <div className="relative z-0 inline-flex w-full items-stretch rounded-md shadow-xs">
             <div
                 className={clsx(
                     canAfford
                         ? 'bg-lime-200 group-hover:bg-lime-300'
                         : 'bg-slate-200',
-                    'flex h-10 flex-grow items-center overflow-hidden rounded-l-md text-xs',
+                    'flex h-10 grow items-center overflow-hidden rounded-l-md text-xs',
                 )}
             >
                 <div

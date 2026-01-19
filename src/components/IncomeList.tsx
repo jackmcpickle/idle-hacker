@@ -17,7 +17,7 @@ export const IncomeList = () => {
                 <div
                     className={clsx(
                         active
-                            ? 'bg-white shadow-sm'
+                            ? 'bg-white shadow-xs'
                             : 'border-dashed border-gray-400 bg-gray-200',
                         'relative rounded-lg border border-gray-200 bg-white p-6',
                     )}
