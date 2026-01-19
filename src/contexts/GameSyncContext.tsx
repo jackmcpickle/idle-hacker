@@ -1,0 +1,36 @@
+import {
+    createContext,
+    useContext,
+    type ReactElement,
+    type ReactNode,
+} from 'react';
+import { useGameSync } from '@/hooks/useGameSync';
+
+type GameSyncContextValue = {
+    sync: () => Promise<void>;
+};
+
+const GameSyncContext = createContext<GameSyncContextValue | null>(null);
+
+export function GameSyncProvider({
+    children,
+}: {
+    children: ReactNode;
+}): ReactElement {
+    const { sync } = useGameSync();
+    return (
+        <GameSyncContext.Provider value={{ sync }}>
+            {children}
+        </GameSyncContext.Provider>
+    );
+}
+
+export function useGameSyncContext(): GameSyncContextValue {
+    const ctx = useContext(GameSyncContext);
+    if (!ctx) {
+        throw new Error(
+            'useGameSyncContext must be used within GameSyncProvider',
+        );
+    }
+    return ctx;
+}

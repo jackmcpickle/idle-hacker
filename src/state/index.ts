@@ -13,6 +13,7 @@ import {
     START_HACK,
     COMPLETE_HACK,
     LOAD_STATE,
+    SET_LAST_SYNCED,
 } from '@/state/actions';
 import { CircleDollarSign, CreditCard, FileText, Globe } from 'lucide-react';
 
@@ -64,6 +65,11 @@ type LoadStateAction = {
     data: unknown;
 };
 
+type SetLastSyncedAction = {
+    type: typeof SET_LAST_SYNCED;
+    data: number;
+};
+
 export type GameAction =
     | CollectIncomeAction
     | IncreaseQtyAction
@@ -71,7 +77,8 @@ export type GameAction =
     | UpgradeHardwareAction
     | StartHackAction
     | CompleteHackAction
-    | LoadStateAction;
+    | LoadStateAction
+    | SetLastSyncedAction;
 
 export const INCOME_TYPES = [
     new IncomeType({
@@ -216,8 +223,15 @@ export const gameReducer = (
             };
         }
         case LOAD_STATE: {
-            // TODO: deserialize from JSON
-            return state;
+            const loaded = action.data as GameContext | null;
+            if (!loaded) return state;
+            return loaded;
+        }
+        case SET_LAST_SYNCED: {
+            return {
+                ...state,
+                lastSyncedAt: action.data,
+            };
         }
         default:
             return state;

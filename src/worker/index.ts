@@ -6,21 +6,24 @@ import { gameRoutes } from './routes/game';
 import { accountRoutes } from './routes/account';
 import type { AppEnv } from './types';
 
-const app = new Hono<AppEnv>();
+const api = new Hono<AppEnv>();
 
-app.use('*', logger());
-app.use(
-    '/api/*',
+api.use('*', logger());
+api.use(
+    '*',
     cors({
         origin: (origin) => origin,
         credentials: true,
     }),
 );
 
-app.route('/api/auth', authRoutes);
-app.route('/api/game', gameRoutes);
-app.route('/api/account', accountRoutes);
+api.route('/auth', authRoutes);
+api.route('/game', gameRoutes);
+api.route('/account', accountRoutes);
 
-app.get('/api/health', (c) => c.json({ status: 'ok' }));
+api.get('/health', (c) => c.json({ status: 'ok' }));
+
+const app = new Hono<AppEnv>();
+app.route('/api', api);
 
 export default app;

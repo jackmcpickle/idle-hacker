@@ -14,7 +14,8 @@
       "Bash(pnpm add:*)",
       "Bash(pnpm routes-gen:*)",
       "Bash(pnpm exec tsr:*)",
-      "Bash(pnpm style:*)"
+      "Bash(pnpm style:*)",
+      "Bash(npx vitest:*)"
     ]
   }
 }

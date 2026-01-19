@@ -1,5 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
+import { useState } from 'react';
 import { useSettings } from '@/contexts/SettingsContext';
+import { useGameSyncContext } from '@/contexts/GameSyncContext';
 import { useGlobalStateProvider } from '@/state/context';
 import { Button } from '@/components/ui/Button';
 import {
@@ -33,6 +35,17 @@ function SettingsPage(): ReactElement {
         setNumberFormat,
     } = useSettings();
     const { state } = useGlobalStateProvider();
+    const { sync } = useGameSyncContext();
+    const [isSyncing, setIsSyncing] = useState(false);
+
+    async function handleSync(): Promise<void> {
+        setIsSyncing(true);
+        try {
+            await sync();
+        } finally {
+            setIsSyncing(false);
+        }
+    }
 
     function handleExport(): void {
         const data = JSON.stringify(state, null, 2);
@@ -194,9 +207,16 @@ function SettingsPage(): ReactElement {
                     <Button
                         variant="outline"
                         className="w-full"
+                        onClick={() => void handleSync()}
+                        disabled={isSyncing}
                     >
-                        <RefreshCw className="mr-2 h-4 w-4" />
-                        Sync Now
+                        <RefreshCw
+                            className={cn(
+                                'mr-2 h-4 w-4',
+                                isSyncing && 'animate-spin',
+                            )}
+                        />
+                        {isSyncing ? 'Syncing...' : 'Sync Now'}
                     </Button>
                 </div>
             </section>

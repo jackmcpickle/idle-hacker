@@ -2,7 +2,6 @@ import { defineConfig } from 'vite';
 import { devtools } from '@tanstack/devtools-vite';
 import viteReact from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
-import { cloudflare } from '@cloudflare/vite-plugin';
 
 import { tanstackRouter } from '@tanstack/router-plugin/vite';
 import { fileURLToPath, URL } from 'node:url';
@@ -10,10 +9,6 @@ import { fileURLToPath, URL } from 'node:url';
 // https://vitejs.dev/config/
 export default defineConfig({
     plugins: [
-        cloudflare({
-            configPath: './wrangler.json',
-            viteEnvironment: { name: 'ssr' },
-        }),
         tailwindcss(),
         devtools(),
         tanstackRouter({
@@ -25,6 +20,14 @@ export default defineConfig({
     resolve: {
         alias: {
             '@': fileURLToPath(new URL('./src', import.meta.url)),
+        },
+    },
+    server: {
+        proxy: {
+            '/api': {
+                target: 'http://localhost:8787',
+                changeOrigin: true,
+            },
         },
     },
 });

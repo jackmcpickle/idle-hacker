@@ -8,6 +8,7 @@ export const UPGRADE_HARDWARE = 'UPGRADE_HARDWARE';
 export const START_HACK = 'START_HACK';
 export const COMPLETE_HACK = 'COMPLETE_HACK';
 export const LOAD_STATE = 'LOAD_STATE';
+export const SET_LAST_SYNCED = 'SET_LAST_SYNCED';
 
 export const increaseQty = (
     name: string,
@@ -62,4 +63,11 @@ export const loadState = (
 ): { type: typeof LOAD_STATE; data: unknown } => ({
     type: LOAD_STATE,
     data: state,
+});
+
+export const setLastSynced = (
+    timestamp: number,
+): { type: typeof SET_LAST_SYNCED; data: number } => ({
+    type: SET_LAST_SYNCED,
+    data: timestamp,
 });
