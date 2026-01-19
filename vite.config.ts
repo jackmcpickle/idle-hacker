@@ -17,11 +17,6 @@ export default defineConfig({
         }),
         viteReact(),
     ],
-    css: {
-        postcss: {
-            plugins: [], // Disable PostCSS config lookup as using tailwindcss plugin
-        },
-    },
     resolve: {
         alias: {
             '@': fileURLToPath(new URL('./src', import.meta.url)),
