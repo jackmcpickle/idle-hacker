@@ -18,25 +18,25 @@ export const IncomeList = () => {
                     className={clsx(
                         active
                             ? 'bg-white shadow-sm'
-                            : 'bg-gray-200 border-gray-400 border-dashed',
-                        'p-6 bg-white border border-gray-200 rounded-lg relative'
+                            : 'border-dashed border-gray-400 bg-gray-200',
+                        'relative rounded-lg border border-gray-200 bg-white p-6',
                     )}
                 >
                     <div
                         className={clsx(
                             active ? '' : 'hidden',
-                            'absolute p-4 -ml-8 bg-white rounded-full left-1/2 -top-8'
+                            'absolute -top-8 left-1/2 -ml-8 rounded-full bg-white p-4',
                         )}
                     >
                         <Icon
-                            className="w-8 h-8 font-light"
+                            className="h-8 w-8 font-light"
                             aria-hidden="true"
                             title={`${incomeType.getCost()} gives + ${incomeType
                                 .getValue()
                                 .display()}`}
                         />
                     </div>
-                    <h2 className="text-lg font-medium text-gray-900 title-font">
+                    <h2 className="title-font text-lg font-medium text-gray-900">
                         {incomeType.name}
                     </h2>
                     {active && (
@@ -50,5 +50,5 @@ export const IncomeList = () => {
         );
     });
 
-    return <div className="flex flex-wrap -m-4">{incomes}</div>;
+    return <div className="-m-4 flex flex-wrap">{incomes}</div>;
 };

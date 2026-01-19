@@ -16,7 +16,7 @@ export function useTimer(incomeType: IncomeType) {
                 ? setTime(time + INTERVAL)
                 : setTime(0);
         },
-        incomeType.hasInventory() ? INTERVAL : null
+        incomeType.hasInventory() ? INTERVAL : null,
     );
 
     useEffect(() => {

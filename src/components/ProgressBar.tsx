@@ -13,13 +13,13 @@ export function ProgressBar({ incomeType }: ProgressBarProps): ReactElement {
     const { percent } = useTimer(incomeType);
 
     return (
-        <div className="relative z-0 inline-flex items-stretch w-full rounded-md shadow-sm">
+        <div className="relative z-0 inline-flex w-full items-stretch rounded-md shadow-sm">
             <div
                 className={clsx(
                     canAfford
                         ? 'bg-lime-200 group-hover:bg-lime-300'
                         : 'bg-slate-200',
-                    'overflow-hidden flex-grow h-10 text-xs flex rounded-l-md items-center'
+                    'flex h-10 flex-grow items-center overflow-hidden rounded-l-md text-xs',
                 )}
             >
                 <div
@@ -34,7 +34,7 @@ export function ProgressBar({ incomeType }: ProgressBarProps): ReactElement {
                         percent === 100 && incomeType.isFastCountdown()
                             ? 'progress-bar-striped animate-progress'
                             : '',
-                        'shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center transition-all duration-50 ease-in h-10'
+                        'flex h-10 flex-col justify-center text-center whitespace-nowrap text-white shadow-none transition-all duration-50 ease-in',
                     )}
                 ></div>
                 <span className="absolute px-4 text-base text-black opacity-75">

@@ -8,8 +8,8 @@ export const App = () => {
         <React.StrictMode>
             <GlobalStateProvider>
                 <Header />
-                <section className="text-gray-600 body-font">
-                    <div className="container px-5 py-24 mx-auto">
+                <section className="body-font text-gray-600">
+                    <div className="container mx-auto px-5 py-24">
                         <IncomeList />
                     </div>
                 </section>

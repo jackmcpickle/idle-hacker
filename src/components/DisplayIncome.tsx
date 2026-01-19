@@ -8,8 +8,8 @@ export const DisplayIncome = () => {
                 Income
             </h3>
             <dl className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-3">
-                <div className="px-4 py-5 bg-white shadow rounded-lg overflow-hidden sm:p-6">
-                    <dt className="text-sm font-medium text-gray-500 truncate">
+                <div className="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6">
+                    <dt className="truncate text-sm font-medium text-gray-500">
                         Bank
                     </dt>
                     <dd className="mt-1 text-3xl font-semibold text-gray-900">

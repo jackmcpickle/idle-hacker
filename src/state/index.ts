@@ -66,7 +66,7 @@ export const INITIAL_GAME_STATE = {
 
 export const gameReducer = (
     state: GameContext,
-    { type, data }: IncomeAction
+    { type, data }: IncomeAction,
 ) => {
     switch (type) {
         case COLLECT_INCOME: {
@@ -74,7 +74,7 @@ export const gameReducer = (
         }
         case INCREASE_QTY: {
             const incomeType = state.incomeTypes.find(
-                (type) => type.name === data.name
+                (type) => type.name === data.name,
             );
             if (!incomeType) return state;
             incomeType.addInventory(data.qty);

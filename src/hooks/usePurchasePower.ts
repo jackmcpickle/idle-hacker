@@ -10,14 +10,14 @@ export const usePurchasePower = (incomeType: IncomeType) => {
             ? Math.floor(
                   (state.bank *
                       (parseInt(state.purchaseMultiplier.value, 10) / 100)) /
-                      incomeType.getCost()
+                      incomeType.getCost(),
               )
             : parseInt(state.purchaseMultiplier.value, 10);
     }, [state, incomeType]);
 
     const canAfford = useMemo(
         () => state.bank >= incomeType.getCost() * purchaseQty,
-        [purchaseQty, state, incomeType]
+        [purchaseQty, state, incomeType],
     );
 
     return {

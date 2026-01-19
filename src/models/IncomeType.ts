@@ -65,7 +65,7 @@ export class IncomeType {
     addInventory(value: number) {
         this.inventory += value;
         const level = levelMultiplier.find(
-            (level) => level.qty <= this.inventory
+            (level) => level.qty <= this.inventory,
         );
         console.log({ level });
         if (level) {
@@ -100,7 +100,7 @@ export class IncomeType {
 
     getIncome() {
         return new NumberUnit(
-            this.inventory * this.income * this.incomeMultiplier
+            this.inventory * this.income * this.incomeMultiplier,
         );
     }
 

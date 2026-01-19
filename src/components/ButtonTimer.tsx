@@ -18,17 +18,17 @@ export const ButtonTimer: React.FC<ButtonTimerProps> = ({ incomeType }) => {
             console.log('INCREASE', purchaseQty);
             dispatch(increaseQty(incomeType.name, purchaseQty));
         },
-        [incomeType]
+        [incomeType],
     );
 
     return (
-        <div className="flex mt-2">
-            <div className="relative inline-flex items-center px-4 py-2 -mr-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-l-md">
+        <div className="mt-2 flex">
+            <div className="relative -mr-1 inline-flex items-center rounded-l-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700">
                 {displayHigh(incomeType.getInventory())}
             </div>
             <button
                 disabled={!canAfford}
-                className="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-r-md hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-limeborder-lime-50-500 focus:border-lime-50-500"
+                className="focus:ring-limeborder-lime-50-500 focus:border-lime-50-500 relative inline-flex items-center rounded-r-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:z-10 focus:ring-1 focus:outline-none"
                 onClick={() => handleIncreaseQty(purchaseQty)}
             >
                 <span>Buy {displayHigh(purchaseQty)}</span>
@@ -38,7 +38,7 @@ export const ButtonTimer: React.FC<ButtonTimerProps> = ({ incomeType }) => {
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth="2"
-                    className="relative w-4 h-4 ml-1 z-1"
+                    className="relative z-1 ml-1 h-4 w-4"
                     viewBox="0 0 24 24"
                 >
                     <path d="M5 12h14M12 5l7 7-7 7"></path>
