@@ -20,7 +20,9 @@
         "declarationMap": true
     },
     "references": [
-        { "path": "./tsconfig.node.json" },
-        { "path": "./tsconfig.app.json" }
+        { "path": "./src/tsconfig.apps.json" },
+        { "path": "./src/ui-service-desk/tsconfig.json" },
+        { "path": "./src/ui-core/tsconfig.json" },
+        { "path": "./tsconfig.node.json" }
     ]
 }

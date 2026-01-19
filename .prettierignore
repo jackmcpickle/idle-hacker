@@ -1,0 +1,15 @@
+**/*.html
+**/*.py
+.uv-cache/
+.venv/
+.nats-config/
+.ruff-cache/
+.pytest_cache/
+.static/
+.static_root/
+node_modules/
+dist/
+build/
+*.lock
+pnpm-lock.yaml
+routeTree.gen.ts
