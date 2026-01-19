@@ -1,12 +1,12 @@
 import {
     createContext,
-    Dispatch,
-    ReactNode,
+    type Dispatch,
+    type ReactNode,
     useContext,
     useMemo,
     useReducer,
 } from 'react';
-import { IncomeAction, gameReducer, INITIAL_GAME_STATE } from '.';
+import { type IncomeAction, gameReducer, INITIAL_GAME_STATE } from '.';
 
 type IncomeContextType = {
     state: typeof INITIAL_GAME_STATE;

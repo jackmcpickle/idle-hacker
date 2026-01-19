@@ -5,6 +5,8 @@ import { RouterProvider, createRouter } from '@tanstack/react-router';
 import { ErrorComponent } from '@/components/ErrorComponent';
 import { Spinner } from '@/components/ui/Spinner';
 
+import '@/index.css';
+
 // Import the generated route tree
 import { routeTree } from './routeTree.gen';
 

@@ -1,10 +1,11 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { App } from '@/components/App';
+import type { ReactElement } from 'react';
 
 export const Route = createFileRoute('/')({
     component: Index,
 });
 
-function Index(): React.JSX.Element {
+function Index(): ReactElement {
     return <App />;
 }

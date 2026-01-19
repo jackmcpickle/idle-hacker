@@ -31,7 +31,7 @@ export function IncomeList(): React.JSX.Element {
                         <Icon
                             className="h-8 w-8 font-light"
                             aria-hidden="true"
-                            title={`${incomeType.getCost()} gives + ${incomeType
+                            aria-label={`${incomeType.getCost()} gives + ${incomeType
                                 .getValue()
                                 .display()}`}
                         />
