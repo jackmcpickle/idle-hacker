@@ -6,15 +6,20 @@ import { useInterval } from 'react-use';
 
 export const INTERVAL = 100;
 
-export function useTimer(incomeType: IncomeType) {
+export function useTimer(incomeType: IncomeType): {
+    time: number;
+    percent: number;
+} {
     const [time, setTime] = useState(0);
     const { dispatch } = useGlobalStateProvider();
 
     useInterval(
         () => {
-            time < incomeType.getCountdown()
-                ? setTime(time + INTERVAL)
-                : setTime(0);
+            if (time < incomeType.getCountdown()) {
+                setTime(time + INTERVAL);
+            } else {
+                setTime(0);
+            }
         },
         incomeType.hasInventory() ? INTERVAL : null,
     );
@@ -23,7 +28,7 @@ export function useTimer(incomeType: IncomeType) {
         if (time >= incomeType.getCountdown()) {
             dispatch(collectIncome(incomeType.getIncome().real()));
         }
-    }, [incomeType, time]);
+    }, [dispatch, incomeType, time]);
 
     return {
         time,

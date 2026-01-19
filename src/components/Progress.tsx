@@ -1,4 +1,8 @@
-export const Progress = ({ progress }: { progress: number }) => {
+export function Progress({
+    progress,
+}: {
+    progress: number;
+}): React.JSX.Element {
     return (
         <div className="relative pt-1">
             <div className="flex h-2 overflow-hidden rounded-sm bg-purple-200 text-xs">
@@ -9,4 +13,4 @@ export const Progress = ({ progress }: { progress: number }) => {
             </div>
         </div>
     );
-};
+}

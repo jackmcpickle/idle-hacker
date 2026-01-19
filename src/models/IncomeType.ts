@@ -1,13 +1,8 @@
-import { ForwardRefExoticComponent, RefAttributes, SVGProps } from 'react';
+import type { LucideIcon } from 'lucide-react';
 import { levelMultiplier } from './levels';
 import { NumberUnit } from './NumberUnit';
 
-export type IconComponent = ForwardRefExoticComponent<
-    Omit<SVGProps<SVGSVGElement>, 'ref'> & {
-        title?: string;
-        titleId?: string;
-    } & RefAttributes<SVGSVGElement>
->;
+export type IconComponent = LucideIcon;
 
 interface IncomeConstructor {
     name: string;
@@ -54,57 +49,56 @@ export class IncomeType {
         this.icon = icon;
     }
 
-    getIcon() {
+    getIcon(): IconComponent {
         return this.icon;
     }
 
-    isUnlocked(value: number) {
+    isUnlocked(value: number): boolean {
         return this.unlockIncome <= value;
     }
 
-    addInventory(value: number) {
+    addInventory(value: number): void {
         this.inventory += value;
         const level = levelMultiplier.find(
             (level) => level.qty <= this.inventory,
         );
-        console.log({ level });
         if (level) {
             this.timeMultiplier = level.speed;
             this.incomeMultiplier = level.income;
         }
     }
 
-    getValue() {
+    getValue(): NumberUnit {
         return new NumberUnit(this.income * this.incomeMultiplier);
     }
 
-    getInventory() {
+    getInventory(): number {
         return this.inventory;
     }
 
-    getCost() {
+    getCost(): number {
         return this.cost;
     }
 
-    getCountdown() {
+    getCountdown(): number {
         return Math.max(this.countdown / this.timeMultiplier, 1000);
     }
 
-    isFastCountdown() {
+    isFastCountdown(): boolean {
         return this.getCountdown() <= 1000;
     }
 
-    getCountdownSec() {
+    getCountdownSec(): string {
         return (this.getCountdown() / 1000).toFixed(2);
     }
 
-    getIncome() {
+    getIncome(): NumberUnit {
         return new NumberUnit(
             this.inventory * this.income * this.incomeMultiplier,
         );
     }
 
-    hasInventory() {
+    hasInventory(): boolean {
         return this.inventory > 0;
     }
 }

@@ -3,7 +3,7 @@ import { GlobalStateProvider } from '@/state/context';
 import { Header } from '@/components/Header';
 import { IncomeList } from '@/components/IncomeList';
 
-export const App = () => {
+export function App(): React.JSX.Element {
     return (
         <React.StrictMode>
             <GlobalStateProvider>
@@ -16,4 +16,4 @@ export const App = () => {
             </GlobalStateProvider>
         </React.StrictMode>
     );
-};
+}

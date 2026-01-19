@@ -4,19 +4,29 @@ import {
     COLLECT_INCOME,
     INCREASE_QTY,
 } from '@/state/actions';
-import {
-    CreditCardIcon,
-    CurrencyDollarIcon,
-    DocumentTextIcon,
-    GlobeAltIcon,
-} from '@heroicons/react/24/solid';
+import { CircleDollarSign, CreditCard, FileText, Globe } from 'lucide-react';
 
 export type GameContext = typeof INITIAL_GAME_STATE;
 
-export interface IncomeAction {
-    type: string;
-    data?: any;
-}
+type CollectIncomeAction = {
+    type: typeof COLLECT_INCOME;
+    data: number;
+};
+
+type IncreaseQtyAction = {
+    type: typeof INCREASE_QTY;
+    data: { name: string; qty: number };
+};
+
+type ChangePurchaseMultiplierAction = {
+    type: typeof CHANGE_PURCHASE_MULTIPLIER;
+    data: { value: string; isPercent: boolean };
+};
+
+export type IncomeAction =
+    | CollectIncomeAction
+    | IncreaseQtyAction
+    | ChangePurchaseMultiplierAction;
 
 export const INCOME_TYPES = [
     new IncomeType({
@@ -26,7 +36,7 @@ export const INCOME_TYPES = [
         countdown: 5000,
         inventory: 1,
         unlockIncome: 0,
-        icon: CreditCardIcon,
+        icon: CreditCard,
     }),
     new IncomeType({
         name: 'Resume Updates',
@@ -34,7 +44,7 @@ export const INCOME_TYPES = [
         income: 10,
         countdown: 10000,
         unlockIncome: 1000,
-        icon: DocumentTextIcon,
+        icon: FileText,
     }),
     new IncomeType({
         name: 'Basic Website',
@@ -42,7 +52,7 @@ export const INCOME_TYPES = [
         income: 50,
         countdown: 60000,
         unlockIncome: 100000,
-        icon: GlobeAltIcon,
+        icon: Globe,
     }),
     new IncomeType({
         name: 'E-commerce site',
@@ -50,7 +60,7 @@ export const INCOME_TYPES = [
         income: 500,
         countdown: 120000,
         unlockIncome: 10000000,
-        icon: CurrencyDollarIcon,
+        icon: CircleDollarSign,
     }),
 ];
 
@@ -66,19 +76,19 @@ export const INITIAL_GAME_STATE = {
 
 export const gameReducer = (
     state: GameContext,
-    { type, data }: IncomeAction,
-) => {
-    switch (type) {
+    action: IncomeAction,
+): GameContext => {
+    switch (action.type) {
         case COLLECT_INCOME: {
-            return { ...state, bank: state.bank + data };
+            return { ...state, bank: state.bank + action.data };
         }
         case INCREASE_QTY: {
             const incomeType = state.incomeTypes.find(
-                (type) => type.name === data.name,
+                (type) => type.name === action.data.name,
             );
             if (!incomeType) return state;
-            incomeType.addInventory(data.qty);
-            const cost = incomeType.getCost() * data.qty;
+            incomeType.addInventory(action.data.qty);
+            const cost = incomeType.getCost() * action.data.qty;
             return {
                 ...state,
                 bank: state.bank - cost,
@@ -87,7 +97,7 @@ export const gameReducer = (
         case CHANGE_PURCHASE_MULTIPLIER:
             return {
                 ...state,
-                purchaseMultiplier: data,
+                purchaseMultiplier: action.data,
             };
         default:
             return state;

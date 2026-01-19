@@ -21,7 +21,7 @@ export function Spinner({ className, size = 'md' }: Props): ReactElement {
     return (
         <div
             className={cn(
-                'inline-flex justify-center items-center px-3 transition',
+                'inline-flex items-center justify-center px-3 transition',
                 'animate-[500ms_spin_linear_infinite]',
                 className,
             )}

@@ -1,6 +1,6 @@
 import { useGlobalStateProvider } from '@/state/context';
 
-export const DisplayIncome = () => {
+export function DisplayIncome(): React.JSX.Element {
     const { state } = useGlobalStateProvider();
     return (
         <div>
@@ -19,4 +19,4 @@ export const DisplayIncome = () => {
             </dl>
         </div>
     );
-};
+}

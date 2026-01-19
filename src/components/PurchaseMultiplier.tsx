@@ -41,14 +41,17 @@ const options = [
     },
 ];
 
-export function PurchaseMultiplier() {
+export function PurchaseMultiplier(): React.JSX.Element {
     const { state, dispatch } = useGlobalStateProvider();
 
-    const handleChange = useCallback((e: ChangeEvent<HTMLSelectElement>) => {
-        const value = e.target.value;
-        const isPercent = value.includes('%');
-        dispatch(setPurchaseMultiplier(value, isPercent));
-    }, []);
+    const handleChange = useCallback(
+        (e: ChangeEvent<HTMLSelectElement>) => {
+            const value = e.target.value;
+            const isPercent = value.includes('%');
+            dispatch(setPurchaseMultiplier(value, isPercent));
+        },
+        [dispatch],
+    );
 
     return (
         <div className="flex items-center">

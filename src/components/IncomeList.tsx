@@ -3,7 +3,7 @@ import { ButtonTimer } from '@/components/ButtonTimer';
 import { ProgressBar } from './ProgressBar';
 import { clsx } from 'clsx';
 
-export const IncomeList = () => {
+export function IncomeList(): React.JSX.Element {
     const { state } = useGlobalStateProvider();
 
     const incomes = state.incomeTypes.map((incomeType, index) => {
@@ -51,4 +51,4 @@ export const IncomeList = () => {
     });
 
     return <div className="-m-4 flex flex-wrap">{incomes}</div>;
-};
+}

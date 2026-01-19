@@ -2,7 +2,10 @@ import { IncomeType } from '@/models/IncomeType';
 import { useGlobalStateProvider } from '@/state/context';
 import { useMemo } from 'react';
 
-export const usePurchasePower = (incomeType: IncomeType) => {
+export function usePurchasePower(incomeType: IncomeType): {
+    canAfford: boolean;
+    purchaseQty: number;
+} {
     const { state } = useGlobalStateProvider();
 
     const purchaseQty = useMemo((): number => {
@@ -24,4 +27,4 @@ export const usePurchasePower = (incomeType: IncomeType) => {
         canAfford,
         purchaseQty: purchaseQty,
     };
-};
+}

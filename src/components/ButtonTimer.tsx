@@ -15,10 +15,9 @@ export const ButtonTimer: React.FC<ButtonTimerProps> = ({ incomeType }) => {
 
     const handleIncreaseQty = useCallback(
         (purchaseQty: number) => {
-            console.log('INCREASE', purchaseQty);
             dispatch(increaseQty(incomeType.name, purchaseQty));
         },
-        [incomeType],
+        [dispatch, incomeType],
     );
 
     return (
@@ -27,6 +26,7 @@ export const ButtonTimer: React.FC<ButtonTimerProps> = ({ incomeType }) => {
                 {displayHigh(incomeType.getInventory())}
             </div>
             <button
+                type="button"
                 disabled={!canAfford}
                 className="focus:ring-limeborder-lime-50-500 focus:border-lime-50-500 relative inline-flex items-center rounded-r-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:z-10 focus:ring-1 focus:outline-hidden"
                 onClick={() => handleIncreaseQty(purchaseQty)}

@@ -15,7 +15,11 @@ type IncomeContextType = {
 
 const GlobalStateContext = createContext({} as IncomeContextType);
 
-export const GlobalStateProvider = ({ children }: { children: ReactNode }) => {
+export function GlobalStateProvider({
+    children,
+}: {
+    children: ReactNode;
+}): React.JSX.Element {
     const [state, dispatch] = useReducer(gameReducer, INITIAL_GAME_STATE);
 
     const stateMemo = useMemo(() => {
@@ -27,6 +31,8 @@ export const GlobalStateProvider = ({ children }: { children: ReactNode }) => {
             {children}
         </GlobalStateContext.Provider>
     );
-};
+}
 
-export const useGlobalStateProvider = () => useContext(GlobalStateContext);
+export function useGlobalStateProvider(): IncomeContextType {
+    return useContext(GlobalStateContext);
+}

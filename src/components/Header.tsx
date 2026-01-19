@@ -1,9 +1,9 @@
 import { useGlobalStateProvider } from '@/state/context';
 import { displayHigh } from '@/utils/displayHigh';
-import { CommandLineIcon } from '@heroicons/react/24/solid';
+import { Terminal } from 'lucide-react';
 import { PurchaseMultiplier } from './PurchaseMultiplier';
 
-export function Header() {
+export function Header(): React.JSX.Element {
     const { state } = useGlobalStateProvider();
     const totalIncomeOverTime = displayHigh(
         state.incomeTypes
@@ -26,7 +26,7 @@ export function Header() {
                 <div className="sm:flex sm:items-center sm:justify-between">
                     <div className="sm:flex sm:space-x-5">
                         <div className="shrink-0">
-                            <CommandLineIcon className="h-16 w-16 text-lime-900" />
+                            <Terminal className="h-16 w-16 text-lime-900" />
                         </div>
                         <div className="mt-4 text-center sm:mt-0 sm:pt-1 sm:text-left">
                             <p className="text-sm font-medium text-gray-600">

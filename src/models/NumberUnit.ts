@@ -6,19 +6,19 @@ export class NumberUnit {
         this.number = number;
     }
 
-    real() {
+    real(): number {
         return this.number;
     }
 
-    display() {
+    display(): string {
         return displayHigh(this.number);
     }
 
-    add(number: number) {
+    add(number: number): void {
         this.number += number;
     }
 
-    subtract(number: number) {
+    subtract(number: number): void {
         this.number -= number;
     }
 }
