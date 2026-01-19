@@ -1,6 +1,6 @@
 import { drizzle, type LibSQLDatabase } from 'drizzle-orm/libsql/web';
 import { createClient } from '@libsql/client/web';
-import * as schema from '@/db/schema';
+import * as schema from '../../db/schema';
 
 export function createDb(
     url: string,

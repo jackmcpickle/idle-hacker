@@ -2,7 +2,7 @@ import { Hono } from 'hono';
 import { zValidator } from '@hono/zod-validator';
 import { z } from 'zod';
 import { eq } from 'drizzle-orm';
-import { usersTable } from '@/db/schema';
+import { usersTable } from '../../db/schema';
 import { createDb } from '../lib/db';
 import { sessionMiddleware, requireAuth } from '../middleware/session';
 import type { AppEnv } from '../types';

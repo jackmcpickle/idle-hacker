@@ -3,8 +3,10 @@ export async function sendMagicLinkEmail(
     email: string,
     token: string,
     baseUrl: string,
+    fromEmail?: string,
 ): Promise<boolean> {
     const magicLink = `${baseUrl}/api/auth/verify?token=${token}`;
+    const from = fromEmail ?? 'Idle Hacker <noreply@updates.mcpickle.com.au>';
 
     const response = await fetch('https://api.resend.com/emails', {
         method: 'POST',
@@ -13,7 +15,7 @@ export async function sendMagicLinkEmail(
             'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-            from: 'Idle Hacker <noreply@idlehacker.com>',
+            from,
             to: [email],
             subject: 'Sign in to Idle Hacker',
             html: `
@@ -25,6 +27,11 @@ export async function sendMagicLinkEmail(
             `,
         }),
     });
+
+    if (!response.ok) {
+        const error = await response.text();
+        console.error('Resend error:', response.status, error);
+    }
 
     return response.ok;
 }

@@ -4,3 +4,6 @@ node_modules
 /lib
 
 .env
+*.vars
+.tanstack
+.wrangler

@@ -1,6 +1,6 @@
 import { createMiddleware } from 'hono/factory';
 import { eq } from 'drizzle-orm';
-import { sessionsTable } from '@/db/schema';
+import { sessionsTable } from '../../db/schema';
 import { createDb } from '../lib/db';
 import { getSessionId } from '../lib/session';
 import type { AppEnv } from '../types';

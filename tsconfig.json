@@ -16,7 +16,11 @@
         "noUncheckedSideEffectImports": true,
         "composite": true,
         "declaration": true,
-        "declarationMap": true
+        "declarationMap": true,
+
+        "paths": {
+            "@/*": ["./src/*"]
+        },
     },
     "references": [
         { "path": "./tsconfig.node.json" },

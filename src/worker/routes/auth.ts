@@ -2,7 +2,7 @@ import { Hono } from 'hono';
 import { zValidator } from '@hono/zod-validator';
 import { z } from 'zod';
 import { eq } from 'drizzle-orm';
-import { usersTable, sessionsTable, magicLinksTable } from '@/db/schema';
+import { usersTable, sessionsTable, magicLinksTable } from '../../db/schema';
 import { createDb } from '../lib/db';
 import { sendMagicLinkEmail } from '../lib/resend';
 import {
