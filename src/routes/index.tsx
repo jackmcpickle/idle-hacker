@@ -1,11 +1,7 @@
-import { createFileRoute } from '@tanstack/react-router';
-import { App } from '@/components/App';
-import type { ReactElement } from 'react';
+import { createFileRoute, redirect } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/')({
-    component: Index,
+    beforeLoad: () => {
+        throw redirect({ to: '/income' });
+    },
 });
-
-function Index(): ReactElement {
-    return <App />;
-}

@@ -1,27 +1,19 @@
-import { createRootRoute, Link, Outlet } from '@tanstack/react-router';
+import { createRootRoute, Outlet } from '@tanstack/react-router';
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
+import { AuthProvider } from '@/contexts/AuthContext';
+import { SettingsProvider } from '@/contexts/SettingsContext';
+import type { ReactElement } from 'react';
 
-function RootLayout(): React.JSX.Element {
+function RootLayout(): ReactElement {
     return (
-        <>
-            <div className="flex gap-2 p-2">
-                <Link
-                    to="/"
-                    className="[&.active]:font-bold"
-                >
-                    Home
-                </Link>{' '}
-                <Link
-                    to="/about"
-                    className="[&.active]:font-bold"
-                >
-                    About
-                </Link>
-            </div>
-            <hr />
-            <Outlet />
-            <TanStackRouterDevtools />
-        </>
+        <SettingsProvider>
+            <AuthProvider>
+                <div className="min-h-screen bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-gray-100">
+                    <Outlet />
+                </div>
+                <TanStackRouterDevtools />
+            </AuthProvider>
+        </SettingsProvider>
     );
 }
 

@@ -1,0 +1,10 @@
+{
+    "name": "idle-hacker",
+    "main": "./src/worker/index.ts",
+    "compatibility_date": "2025-01-15",
+    "compatibility_flags": ["nodejs_compat"],
+    "vars": {},
+    "observability": {
+        "enabled": true
+    }
+}

@@ -1,25 +1,31 @@
 import {
     createContext,
     type Dispatch,
+    type ReactElement,
     type ReactNode,
     useContext,
     useMemo,
     useReducer,
 } from 'react';
-import { type IncomeAction, gameReducer, INITIAL_GAME_STATE } from '.';
+import {
+    type GameAction,
+    type GameContext,
+    gameReducer,
+    INITIAL_GAME_STATE,
+} from '.';
 
-type IncomeContextType = {
-    state: typeof INITIAL_GAME_STATE;
-    dispatch: Dispatch<IncomeAction>;
+type GameContextType = {
+    state: GameContext;
+    dispatch: Dispatch<GameAction>;
 };
 
-const GlobalStateContext = createContext({} as IncomeContextType);
+const GlobalStateContext = createContext({} as GameContextType);
 
 export function GlobalStateProvider({
     children,
 }: {
     children: ReactNode;
-}): React.JSX.Element {
+}): ReactElement {
     const [state, dispatch] = useReducer(gameReducer, INITIAL_GAME_STATE);
 
     const stateMemo = useMemo(() => {
@@ -33,6 +39,6 @@ export function GlobalStateProvider({
     );
 }
 
-export function useGlobalStateProvider(): IncomeContextType {
+export function useGlobalStateProvider(): GameContextType {
     return useContext(GlobalStateContext);
 }

@@ -8,7 +8,13 @@
       "Bash(pnpm lint:*)",
       "Bash(pnpm test:*)",
       "Bash(pnpm style-fix:*)",
-      "Bash(pnpm vitest:*)"
+      "Bash(pnpm vitest:*)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(pnpm add:*)",
+      "Bash(pnpm routes-gen:*)",
+      "Bash(pnpm exec tsr:*)",
+      "Bash(pnpm style:*)"
     ]
   }
 }
