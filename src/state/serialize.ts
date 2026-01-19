@@ -20,6 +20,7 @@ type SerializedState = {
     activeHacks: (ActiveHack | null)[];
     maxHackSlots: number;
     lastSyncedAt: number;
+    incomeTimers: Record<string, number>;
 };
 
 const STORAGE_KEY = 'idle-hacker-save';
@@ -41,6 +42,7 @@ export function serializeState(state: GameContext): SerializedState {
         activeHacks: state.activeHacks,
         maxHackSlots: state.maxHackSlots,
         lastSyncedAt: state.lastSyncedAt,
+        incomeTimers: state.incomeTimers,
     };
 }
 
@@ -77,6 +79,15 @@ export function deserializeState(data: unknown): GameContext | null {
         return template;
     });
 
+    // Reset income timers to now so progress bars start fresh
+    const now = Date.now();
+    const resetIncomeTimers: Record<string, number> = {};
+    for (const income of incomeTypes) {
+        if (income.hasInventory()) {
+            resetIncomeTimers[income.name] = now;
+        }
+    }
+
     return {
         name: INITIAL_GAME_STATE.name,
         bank: saved.bank ?? 0,
@@ -91,6 +102,9 @@ export function deserializeState(data: unknown): GameContext | null {
         activeHacks: saved.activeHacks ?? [null],
         maxHackSlots: saved.maxHackSlots ?? 1,
         lastSyncedAt: saved.lastSyncedAt ?? Date.now(),
+        incomeTimers: resetIncomeTimers,
+        globalTick: now,
+        completedHacks: [],
     };
 }
 
@@ -114,24 +128,48 @@ export function loadFromLocalStorage(): GameContext | null {
     }
 }
 
+import { HackingJob, type HackJobId } from '@/models/HackingJob';
+
+export type OfflineProgress = {
+    earnedWhileAway: number;
+    influenceEarned: number;
+    completedHackJobIds: HackJobId[];
+    completedActiveHackSlots: number[];
+    hackCostsPaid: number;
+};
+
 export function calculateOfflineProgress(
     state: GameContext,
     lastActiveAt: number,
-): { earnedWhileAway: number } {
+): OfflineProgress {
     const now = Date.now();
     const elapsedMs = now - lastActiveAt;
 
-    if (elapsedMs <= 0) return { earnedWhileAway: 0 };
+    if (elapsedMs <= 0) {
+        return {
+            earnedWhileAway: 0,
+            influenceEarned: 0,
+            completedHackJobIds: [],
+            completedActiveHackSlots: [],
+        };
+    }
+
+    // Calculate hardware speed bonus
+    const hardwareSpeedBonus = state.hardware.reduce(
+        (sum, hw) => sum + hw.getSpeedBonus(),
+        0,
+    );
+    const speedMultiplier = 1 + hardwareSpeedBonus;
 
     // Calculate passive income earned while away
-    // Only count income sources that auto-collect (countdown passed)
     let earnedWhileAway = 0;
 
     for (const income of state.incomeTypes) {
         if (income.inventory <= 0) continue;
 
-        // getIncome() already accounts for inventory, so don't multiply again
-        const incomePerMs = income.getIncome().real() / income.getCountdown();
+        // Apply hardware speed bonus to countdown
+        const adjustedCountdown = income.getCountdown() / speedMultiplier;
+        const incomePerMs = income.getIncome().real() / adjustedCountdown;
         const passiveEarnings = incomePerMs * elapsedMs;
         earnedWhileAway += passiveEarnings;
     }
@@ -142,5 +180,40 @@ export function calculateOfflineProgress(
         earnedWhileAway *= maxOfflineMs / elapsedMs;
     }
 
-    return { earnedWhileAway: Math.floor(earnedWhileAway) };
+    // Calculate completed hacks and hack costs
+    let influenceEarned = 0;
+    let hackCostsPaid = 0;
+    const completedHackJobIds: HackJobId[] = [];
+    const completedActiveHackSlots: number[] = [];
+
+    for (let slot = 0; slot < state.activeHacks.length; slot += 1) {
+        const hack = state.activeHacks[slot];
+        if (!hack) continue;
+
+        const job = new HackingJob(hack.jobId);
+        const costPerMs = job.getCostPerSecond() / 1000;
+
+        if (now >= hack.endsAt) {
+            // Hack completed - pay remaining cost
+            const remainingCost = job.getTotalCost() - hack.totalCostPaid;
+            hackCostsPaid += remainingCost;
+            influenceEarned += job.influenceReward;
+            completedHackJobIds.push(hack.jobId);
+            completedActiveHackSlots.push(slot);
+        } else {
+            // Hack still running - pay elapsed cost
+            const elapsedSinceLastCost = now - hack.lastCostTick;
+            const costToDrain = costPerMs * elapsedSinceLastCost;
+            const maxCost = job.getTotalCost() - hack.totalCostPaid;
+            hackCostsPaid += Math.min(costToDrain, maxCost);
+        }
+    }
+
+    return {
+        earnedWhileAway: Math.floor(earnedWhileAway),
+        influenceEarned,
+        completedHackJobIds,
+        completedActiveHackSlots,
+        hackCostsPaid: Math.floor(hackCostsPaid),
+    };
 }

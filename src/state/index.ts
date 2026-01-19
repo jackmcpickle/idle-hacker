@@ -14,8 +14,16 @@ import {
     COMPLETE_HACK,
     LOAD_STATE,
     SET_LAST_SYNCED,
+    GAME_TICK,
+    APPLY_OFFLINE_PROGRESS,
+    type OfflineProgressData,
 } from '@/state/actions';
 import { CircleDollarSign, CreditCard, FileText, Globe } from 'lucide-react';
+
+export type CompletedHack = {
+    jobName: string;
+    influenceReward: number;
+};
 
 export type GameContext = {
     name: string;
@@ -28,6 +36,9 @@ export type GameContext = {
     activeHacks: (ActiveHack | null)[];
     maxHackSlots: number;
     lastSyncedAt: number;
+    incomeTimers: Record<string, number>;
+    globalTick: number;
+    completedHacks: CompletedHack[];
 };
 
 type CollectIncomeAction = {
@@ -70,6 +81,16 @@ type SetLastSyncedAction = {
     data: number;
 };
 
+type GameTickAction = {
+    type: typeof GAME_TICK;
+    data: { now: number };
+};
+
+type ApplyOfflineProgressAction = {
+    type: typeof APPLY_OFFLINE_PROGRESS;
+    data: OfflineProgressData;
+};
+
 export type GameAction =
     | CollectIncomeAction
     | IncreaseQtyAction
@@ -78,7 +99,9 @@ export type GameAction =
     | StartHackAction
     | CompleteHackAction
     | LoadStateAction
-    | SetLastSyncedAction;
+    | SetLastSyncedAction
+    | GameTickAction
+    | ApplyOfflineProgressAction;
 
 export const INCOME_TYPES = [
     new IncomeType({
@@ -130,6 +153,9 @@ export const INITIAL_GAME_STATE: GameContext = {
     activeHacks: [null],
     maxHackSlots: 1,
     lastSyncedAt: Date.now(),
+    incomeTimers: {},
+    globalTick: Date.now(),
+    completedHacks: [],
 };
 
 function calculateMaxHackSlots(hardware: HardwareItem[]): number {
@@ -160,6 +186,7 @@ export const gameReducer = (
             return {
                 ...state,
                 bank: state.bank - cost,
+                incomeTypes: [...state.incomeTypes],
             };
         }
         case CHANGE_PURCHASE_MULTIPLIER:
@@ -173,7 +200,8 @@ export const gameReducer = (
             const cost = hw.getCost();
             if (state.bank < cost) return state;
             hw.upgrade();
-            const newMaxSlots = calculateMaxHackSlots(state.hardware);
+            const newHardware = [...state.hardware];
+            const newMaxSlots = calculateMaxHackSlots(newHardware);
             const newActiveHacks = [...state.activeHacks];
             while (newActiveHacks.length < newMaxSlots) {
                 newActiveHacks.push(null);
@@ -181,6 +209,7 @@ export const gameReducer = (
             return {
                 ...state,
                 bank: state.bank - cost,
+                hardware: newHardware,
                 maxHackSlots: newMaxSlots,
                 activeHacks: newActiveHacks,
             };
@@ -191,7 +220,6 @@ export const gameReducer = (
                 return state;
             }
             const job = new HackingJob(jobId);
-            if (state.bank < job.cost) return state;
             const hwLevels = Object.fromEntries(
                 state.hardware.map((h) => [h.id, h.level]),
             ) as Record<HardwareId, number>;
@@ -202,10 +230,11 @@ export const gameReducer = (
                 jobId,
                 startedAt: now,
                 endsAt: now + job.duration,
+                totalCostPaid: 0,
+                lastCostTick: now,
             };
             return {
                 ...state,
-                bank: state.bank - job.cost,
                 activeHacks: newActiveHacks,
             };
         }
@@ -231,6 +260,135 @@ export const gameReducer = (
             return {
                 ...state,
                 lastSyncedAt: action.data,
+            };
+        }
+        case GAME_TICK: {
+            const { now } = action.data;
+            let newBank = state.bank;
+            let newTotalEarned = state.totalEarned;
+            let newInfluence = state.influence;
+            const newIncomeTimers = { ...state.incomeTimers };
+            const newActiveHacks = [...state.activeHacks];
+            const completedHacks: CompletedHack[] = [];
+
+            // Calculate total hardware speed bonus
+            const hardwareSpeedBonus = state.hardware.reduce(
+                (sum, hw) => sum + hw.getSpeedBonus(),
+                0,
+            );
+            const speedMultiplier = 1 + hardwareSpeedBonus;
+
+            // Process income timers
+            for (const income of state.incomeTypes) {
+                if (!income.hasInventory()) continue;
+
+                // Initialize timer if not set
+                if (newIncomeTimers[income.name] === undefined) {
+                    newIncomeTimers[income.name] = now;
+                    continue;
+                }
+
+                const lastCollected = newIncomeTimers[income.name];
+                const elapsed = now - lastCollected;
+                // Apply hardware speed bonus to countdown
+                const countdown = income.getCountdown() / speedMultiplier;
+
+                if (elapsed >= countdown) {
+                    const incomeAmount = income.getIncome().real();
+                    newBank += incomeAmount;
+                    newTotalEarned += incomeAmount;
+                    newIncomeTimers[income.name] = now;
+                }
+            }
+
+            // Process hacks - drain cost per second and auto-complete
+            for (let slot = 0; slot < newActiveHacks.length; slot += 1) {
+                const hack = newActiveHacks[slot];
+                if (!hack) continue;
+
+                const job = new HackingJob(hack.jobId);
+                const costPerMs = job.getCostPerSecond() / 1000;
+
+                // Check if hack is complete
+                if (now >= hack.endsAt) {
+                    // Drain remaining cost
+                    const remainingCost = job.getTotalCost() - hack.totalCostPaid;
+                    if (remainingCost > 0 && newBank >= remainingCost) {
+                        newBank -= remainingCost;
+                    }
+                    newInfluence += job.influenceReward;
+                    completedHacks.push({
+                        jobName: job.name,
+                        influenceReward: job.influenceReward,
+                    });
+                    newActiveHacks[slot] = null;
+                } else {
+                    // Drain cost for elapsed time
+                    const elapsedSinceLastCost = now - hack.lastCostTick;
+                    const costToDrain = costPerMs * elapsedSinceLastCost;
+                    const maxCost = job.getTotalCost() - hack.totalCostPaid;
+                    const actualCost = Math.min(costToDrain, maxCost, newBank);
+
+                    if (actualCost > 0) {
+                        newBank -= actualCost;
+                        newActiveHacks[slot] = {
+                            ...hack,
+                            totalCostPaid: hack.totalCostPaid + actualCost,
+                            lastCostTick: now,
+                        };
+                    } else if (newBank <= 0) {
+                        // Out of money - pause cost drain but keep hack running
+                        newActiveHacks[slot] = {
+                            ...hack,
+                            lastCostTick: now,
+                        };
+                    }
+                }
+            }
+
+            // Only create new state if something changed
+            if (
+                newBank === state.bank &&
+                newInfluence === state.influence &&
+                completedHacks.length === 0
+            ) {
+                return {
+                    ...state,
+                    globalTick: now,
+                    incomeTimers: newIncomeTimers,
+                    completedHacks: [],
+                };
+            }
+
+            return {
+                ...state,
+                bank: newBank,
+                totalEarned: newTotalEarned,
+                influence: newInfluence,
+                activeHacks: newActiveHacks,
+                globalTick: now,
+                incomeTimers: newIncomeTimers,
+                completedHacks,
+            };
+        }
+        case APPLY_OFFLINE_PROGRESS: {
+            const {
+                earnedWhileAway,
+                influenceEarned,
+                completedActiveHackSlots,
+                hackCostsPaid,
+            } = action.data;
+            const newActiveHacks = [...state.activeHacks];
+            for (const slot of completedActiveHackSlots) {
+                newActiveHacks[slot] = null;
+            }
+            const netEarnings = earnedWhileAway - hackCostsPaid;
+            return {
+                ...state,
+                bank: state.bank + netEarnings,
+                totalEarned: state.totalEarned + earnedWhileAway,
+                influence: state.influence + influenceEarned,
+                activeHacks: newActiveHacks,
             };
         }
         default:

@@ -1,40 +1,28 @@
-import { IncomeType } from '@/models/IncomeType';
-import { collectIncome } from '@/state/actions';
+import type { IncomeType } from '@/models/IncomeType';
 import { useGlobalStateProvider } from '@/state/context';
-import { useEffect, useState } from 'react';
-import { useInterval } from 'react-use';
-
-export const INTERVAL = 100;
 
 export function useTimer(incomeType: IncomeType): {
     time: number;
     percent: number;
 } {
-    const [time, setTime] = useState(0);
-    const { dispatch } = useGlobalStateProvider();
+    const { state } = useGlobalStateProvider();
 
-    useInterval(
-        () => {
-            if (time < incomeType.getCountdown()) {
-                setTime(time + INTERVAL);
-            } else {
-                setTime(0);
-            }
-        },
-        incomeType.hasInventory() ? INTERVAL : null,
+    // Calculate hardware speed bonus
+    const hardwareSpeedBonus = state.hardware.reduce(
+        (sum, hw) => sum + hw.getSpeedBonus(),
+        0,
     );
+    const speedMultiplier = 1 + hardwareSpeedBonus;
 
-    useEffect(() => {
-        if (time >= incomeType.getCountdown()) {
-            dispatch(collectIncome(incomeType.getIncome().real()));
-        }
-    }, [dispatch, incomeType, time]);
+    const lastCollected =
+        state.incomeTimers[incomeType.name] ?? state.globalTick;
+    const elapsed = state.globalTick - lastCollected;
+    // Apply hardware speed bonus to countdown
+    const countdown = incomeType.getCountdown() / speedMultiplier;
+    const time = Math.min(elapsed, countdown);
 
     return {
         time,
-        // if under 1sec just show at 100%
-        percent: incomeType.isFastCountdown()
-            ? 100
-            : (time / incomeType.getCountdown()) * 100,
+        percent: incomeType.isFastCountdown() ? 100 : (time / countdown) * 100,
     };
 }

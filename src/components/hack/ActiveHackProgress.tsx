@@ -1,8 +1,7 @@
-import { useState, useEffect } from 'react';
 import { useGlobalStateProvider } from '@/state/context';
 import { completeHack } from '@/state/actions';
 import { HackingJob, type ActiveHack } from '@/models/HackingJob';
-import { Zap, CheckCircle } from 'lucide-react';
+import { Zap, CheckCircle, DollarSign } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import type { ReactElement } from 'react';
 
@@ -12,14 +11,9 @@ type Props = {
 };
 
 export function ActiveHackProgress({ hack, slot }: Props): ReactElement {
-    const { dispatch } = useGlobalStateProvider();
-    const [now, setNow] = useState(Date.now());
+    const { state, dispatch } = useGlobalStateProvider();
     const job = new HackingJob(hack.jobId);
-
-    useEffect(() => {
-        const interval = setInterval(() => setNow(Date.now()), 100);
-        return () => clearInterval(interval);
-    }, []);
+    const now = state.globalTick;
 
     const elapsed = now - hack.startedAt;
     const remaining = Math.max(0, hack.endsAt - now);
@@ -51,6 +45,16 @@ export function ActiveHackProgress({ hack, slot }: Props): ReactElement {
                     className="h-full bg-purple-500 transition-all duration-100"
                     style={{ width: `${progress}%` }}
                 />
+            </div>
+
+            <div className="mb-2 flex items-center justify-between text-xs text-purple-600 dark:text-purple-400">
+                <div className="flex items-center gap-1">
+                    <DollarSign className="h-3 w-3" />
+                    <span>${job.getCostPerSecond().toFixed(2)}/s</span>
+                </div>
+                <span>
+                    ${hack.totalCostPaid.toFixed(0)} / ${job.getTotalCost()}
+                </span>
             </div>
 
             {isComplete ? (

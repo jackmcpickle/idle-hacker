@@ -1,7 +1,11 @@
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback, useState } from 'react';
 import { useGlobalStateProvider } from '@/state/context';
 import { useAuth } from '@/contexts/AuthContext';
-import { loadState, setLastSynced, collectIncome } from '@/state/actions';
+import {
+    loadState,
+    setLastSynced,
+    applyOfflineProgress,
+} from '@/state/actions';
 import {
     saveToLocalStorage,
     loadFromLocalStorage,
@@ -47,9 +51,25 @@ async function syncToServer(state: GameContext): Promise<boolean> {
     }
 }
 
-export function useGameSync(): { sync: () => Promise<void> } {
+export type OfflineProgressReport = {
+    earnedWhileAway: number;
+    influenceEarned: number;
+    hacksCompleted: number;
+    hackCostsPaid: number;
+    timeAwayMs: number;
+};
+
+export function useGameSync(): {
+    sync: () => Promise<void>;
+    isLoading: boolean;
+    offlineProgress: OfflineProgressReport | null;
+    clearOfflineProgress: () => void;
+} {
     const { state, dispatch } = useGlobalStateProvider();
     const { isAuthenticated, isLoading: authLoading } = useAuth();
+    const [isLoading, setIsLoading] = useState(true);
+    const [offlineProgress, setOfflineProgress] =
+        useState<OfflineProgressReport | null>(null);
     const hasLoadedRef = useRef(false);
     const stateRef = useRef(state);
     stateRef.current = state;
@@ -65,47 +85,66 @@ export function useGameSync(): { sync: () => Promise<void> } {
                 localStorage.getItem(LAST_ACTIVE_KEY) ?? '0',
                 10,
             );
+            const now = Date.now();
+
+            let stateToUse: GameContext | null = null;
 
             if (isAuthenticated) {
                 const serverData = await fetchServerState();
                 if (serverData) {
                     const serverState = deserializeState(serverData.state);
-                    // Use whichever is more recent
                     if (
                         serverState &&
                         (!localState ||
                             serverData.updatedAt > localState.lastSyncedAt)
                     ) {
-                        dispatch(loadState(serverState));
-                        // Calculate offline progress from server state
-                        if (lastActive > 0) {
-                            const { earnedWhileAway } =
-                                calculateOfflineProgress(
-                                    serverState,
-                                    lastActive,
-                                );
-                            if (earnedWhileAway > 0) {
-                                dispatch(collectIncome(earnedWhileAway));
-                            }
-                        }
-                        return;
+                        stateToUse = serverState;
                     }
                 }
             }
 
-            // Fall back to local state
-            if (localState) {
-                dispatch(loadState(localState));
+            if (!stateToUse && localState) {
+                stateToUse = localState;
+            }
+
+            if (stateToUse) {
+                dispatch(loadState(stateToUse));
+
+                // Calculate offline progress
                 if (lastActive > 0) {
-                    const { earnedWhileAway } = calculateOfflineProgress(
-                        localState,
+                    const progress = calculateOfflineProgress(
+                        stateToUse,
                         lastActive,
                     );
-                    if (earnedWhileAway > 0) {
-                        dispatch(collectIncome(earnedWhileAway));
+
+                    if (
+                        progress.earnedWhileAway > 0 ||
+                        progress.influenceEarned > 0 ||
+                        progress.hackCostsPaid > 0
+                    ) {
+                        dispatch(
+                            applyOfflineProgress({
+                                earnedWhileAway: progress.earnedWhileAway,
+                                influenceEarned: progress.influenceEarned,
+                                completedActiveHackSlots:
+                                    progress.completedActiveHackSlots,
+                                hackCostsPaid: progress.hackCostsPaid,
+                            }),
+                        );
+
+                        setOfflineProgress({
+                            earnedWhileAway: progress.earnedWhileAway,
+                            influenceEarned: progress.influenceEarned,
+                            hacksCompleted:
+                                progress.completedActiveHackSlots.length,
+                            hackCostsPaid: progress.hackCostsPaid,
+                            timeAwayMs: now - lastActive,
+                        });
                     }
                 }
             }
+
+            setIsLoading(false);
         }
 
         void loadInitialState();
@@ -113,9 +152,10 @@ export function useGameSync(): { sync: () => Promise<void> } {
 
     // Save to localStorage on state change
     useEffect(() => {
+        if (isLoading) return;
         saveToLocalStorage(state);
         localStorage.setItem(LAST_ACTIVE_KEY, Date.now().toString());
-    }, [state]);
+    }, [state, isLoading]);
 
     // Manual sync function
     const sync = useCallback(async (): Promise<void> => {
@@ -128,7 +168,7 @@ export function useGameSync(): { sync: () => Promise<void> } {
 
     // Background sync every 60s
     useEffect(() => {
-        if (!isAuthenticated) return;
+        if (!isAuthenticated || isLoading) return;
 
         const interval = setInterval(() => {
             void syncToServer(stateRef.current).then((success) => {
@@ -139,7 +179,7 @@ export function useGameSync(): { sync: () => Promise<void> } {
         }, SYNC_INTERVAL_MS);
 
         return () => clearInterval(interval);
-    }, [isAuthenticated, dispatch]);
+    }, [isAuthenticated, isLoading, dispatch]);
 
     // Sync on visibility change and beforeunload
     useEffect(() => {
@@ -147,7 +187,6 @@ export function useGameSync(): { sync: () => Promise<void> } {
 
         function handleVisibilityChange(): void {
             if (document.visibilityState === 'hidden') {
-                // Use sendBeacon for reliability
                 const serialized = serializeState(stateRef.current);
                 const blob = new Blob([JSON.stringify({ state: serialized })], {
                     type: 'application/json',
@@ -176,5 +215,9 @@ export function useGameSync(): { sync: () => Promise<void> } {
         };
     }, [isAuthenticated]);
 
-    return { sync };
+    const clearOfflineProgress = useCallback(() => {
+        setOfflineProgress(null);
+    }, []);
+
+    return { sync, isLoading, offlineProgress, clearOfflineProgress };
 }

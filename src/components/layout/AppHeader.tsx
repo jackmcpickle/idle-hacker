@@ -1,4 +1,5 @@
 import { useGlobalStateProvider } from '@/state/context';
+import { HackingJob } from '@/models/HackingJob';
 import { displayHigh } from '@/utils/displayHigh';
 import { Terminal, TrendingUp, Zap } from 'lucide-react';
 import type { ReactElement } from 'react';
@@ -6,12 +7,32 @@ import type { ReactElement } from 'react';
 export function AppHeader(): ReactElement {
     const { state } = useGlobalStateProvider();
 
-    const avgIncome = state.incomeTypes
+    // Calculate hardware speed bonus
+    const hardwareSpeedBonus = state.hardware.reduce(
+        (sum, hw) => sum + hw.getSpeedBonus(),
+        0,
+    );
+    const speedMultiplier = 1 + hardwareSpeedBonus;
+
+    // Income per second (with hardware bonus)
+    const incomePerSec = state.incomeTypes
         .filter((i) => i.hasInventory())
-        .reduce(
-            (sum, i) => sum + (i.getIncome().real() / i.getCountdown()) * 1000,
-            0,
-        );
+        .reduce((sum, i) => {
+            const adjustedCountdown = i.getCountdown() / speedMultiplier;
+            return sum + (i.getIncome().real() / adjustedCountdown) * 1000;
+        }, 0);
+
+    // Debit per second from active hacks
+    const debitPerSec = state.activeHacks
+        .filter((h): h is NonNullable<typeof h> => h !== null)
+        .reduce((sum, h) => {
+            const job = new HackingJob(h.jobId);
+            return sum + job.getCostPerSecond();
+        }, 0);
+
+    const totalFlow = incomePerSec + debitPerSec;
+    const incomePercent = totalFlow > 0 ? (incomePerSec / totalFlow) * 100 : 100;
+    const netPerSec = incomePerSec - debitPerSec;
 
     return (
         <header className="sticky top-0 z-10 border-b border-gray-200 bg-white/95 backdrop-blur dark:border-gray-700 dark:bg-gray-900/95">
@@ -37,8 +58,32 @@ export function AppHeader(): ReactElement {
                     </div>
                 </div>
             </div>
-            <div className="border-t border-gray-100 bg-gray-50 px-4 py-1 text-center text-xs text-gray-500 dark:border-gray-800 dark:bg-gray-800 dark:text-gray-400">
-                ${displayHigh(avgIncome)}/sec
+            <div className="border-t border-gray-100 bg-gray-50 px-4 py-1.5 dark:border-gray-800 dark:bg-gray-800">
+                <div className="mx-auto flex max-w-lg items-center gap-2">
+                    <span className="w-16 text-xs text-green-600 dark:text-green-400">
+                        +${displayHigh(incomePerSec)}
+                    </span>
+                    <div className="relative h-2 flex-1 overflow-hidden rounded-full bg-red-400 dark:bg-red-600">
+                        <div
+                            className="absolute inset-y-0 left-0 bg-green-500 transition-all duration-300 dark:bg-green-400"
+                            style={{ width: `${incomePercent}%` }}
+                        />
+                    </div>
+                    <span className="w-16 text-right text-xs text-red-600 dark:text-red-400">
+                        -${displayHigh(debitPerSec)}
+                    </span>
+                </div>
+                <div className="mt-0.5 text-center text-xs">
+                    <span
+                        className={
+                            netPerSec >= 0
+                                ? 'text-green-600 dark:text-green-400'
+                                : 'text-red-600 dark:text-red-400'
+                        }
+                    >
+                        {netPerSec >= 0 ? '+' : ''}${displayHigh(netPerSec)}/sec
+                    </span>
+                </div>
             </div>
         </header>
     );

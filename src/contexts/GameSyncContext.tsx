@@ -4,10 +4,13 @@ import {
     type ReactElement,
     type ReactNode,
 } from 'react';
-import { useGameSync } from '@/hooks/useGameSync';
+import { useGameSync, type OfflineProgressReport } from '@/hooks/useGameSync';
 
 type GameSyncContextValue = {
     sync: () => Promise<void>;
+    isLoading: boolean;
+    offlineProgress: OfflineProgressReport | null;
+    clearOfflineProgress: () => void;
 };
 
 const GameSyncContext = createContext<GameSyncContextValue | null>(null);
@@ -17,9 +20,12 @@ export function GameSyncProvider({
 }: {
     children: ReactNode;
 }): ReactElement {
-    const { sync } = useGameSync();
+    const { sync, isLoading, offlineProgress, clearOfflineProgress } =
+        useGameSync();
     return (
-        <GameSyncContext.Provider value={{ sync }}>
+        <GameSyncContext.Provider
+            value={{ sync, isLoading, offlineProgress, clearOfflineProgress }}
+        >
             {children}
         </GameSyncContext.Provider>
     );

@@ -9,6 +9,8 @@ export const START_HACK = 'START_HACK';
 export const COMPLETE_HACK = 'COMPLETE_HACK';
 export const LOAD_STATE = 'LOAD_STATE';
 export const SET_LAST_SYNCED = 'SET_LAST_SYNCED';
+export const GAME_TICK = 'GAME_TICK';
+export const APPLY_OFFLINE_PROGRESS = 'APPLY_OFFLINE_PROGRESS';
 
 export const increaseQty = (
     name: string,
@@ -70,4 +72,25 @@ export const setLastSynced = (
 ): { type: typeof SET_LAST_SYNCED; data: number } => ({
     type: SET_LAST_SYNCED,
     data: timestamp,
+});
+
+export const gameTick = (
+    now: number,
+): { type: typeof GAME_TICK; data: { now: number } } => ({
+    type: GAME_TICK,
+    data: { now },
+});
+
+export type OfflineProgressData = {
+    earnedWhileAway: number;
+    influenceEarned: number;
+    completedActiveHackSlots: number[];
+    hackCostsPaid: number;
+};
+
+export const applyOfflineProgress = (
+    data: OfflineProgressData,
+): { type: typeof APPLY_OFFLINE_PROGRESS; data: OfflineProgressData } => ({
+    type: APPLY_OFFLINE_PROGRESS,
+    data,
 });

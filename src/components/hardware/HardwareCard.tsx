@@ -1,4 +1,5 @@
 import { useGlobalStateProvider } from '@/state/context';
+import { useGameSyncContext } from '@/contexts/GameSyncContext';
 import { upgradeHardware } from '@/state/actions';
 import { displayHigh } from '@/utils/displayHigh';
 import { Button } from '@/components/ui/Button';
@@ -12,6 +13,7 @@ type Props = {
 
 export function HardwareCard({ hardware }: Props): ReactElement {
     const { state, dispatch } = useGlobalStateProvider();
+    const { sync } = useGameSyncContext();
     const Icon = hardware.getIcon();
     const cost = hardware.getCost();
     const canAfford = state.bank >= cost;
@@ -19,6 +21,7 @@ export function HardwareCard({ hardware }: Props): ReactElement {
 
     function handleUpgrade(): void {
         dispatch(upgradeHardware(hardware.id));
+        void sync();
     }
 
     return (

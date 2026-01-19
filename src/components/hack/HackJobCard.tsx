@@ -1,6 +1,6 @@
 import { useGlobalStateProvider } from '@/state/context';
+import { useGameSyncContext } from '@/contexts/GameSyncContext';
 import { startHack } from '@/state/actions';
-import { displayHigh } from '@/utils/displayHigh';
 import { Button } from '@/components/ui/Button';
 import { Play, Lock, Zap, Clock, DollarSign } from 'lucide-react';
 import { HackingJob } from '@/models/HackingJob';
@@ -13,20 +13,21 @@ type Props = {
 
 export function HackJobCard({ job }: Props): ReactElement {
     const { state, dispatch } = useGlobalStateProvider();
+    const { sync } = useGameSyncContext();
 
     const hwLevels = Object.fromEntries(
         state.hardware.map((h) => [h.id, h.level]),
     ) as Record<HardwareId, number>;
 
     const meetsRequirements = job.meetsRequirements(hwLevels);
-    const canAfford = state.bank >= job.cost;
     const freeSlot = state.activeHacks.findIndex((h) => h === null);
     const hasSlot = freeSlot !== -1;
-    const canStart = meetsRequirements && canAfford && hasSlot;
+    const canStart = meetsRequirements && hasSlot;
 
     function handleStart(): void {
         if (canStart) {
             dispatch(startHack(job.id, freeSlot));
+            void sync();
         }
     }
 
@@ -51,7 +52,7 @@ export function HackJobCard({ job }: Props): ReactElement {
                 </div>
                 <div className="flex items-center gap-1 text-gray-500 dark:text-gray-400">
                     <DollarSign className="h-4 w-4" />
-                    <span>{displayHigh(job.cost)}</span>
+                    <span>${job.getCostPerSecond().toFixed(2)}/s</span>
                 </div>
                 <div className="flex items-center gap-1 text-purple-500">
                     <Zap className="h-4 w-4" />

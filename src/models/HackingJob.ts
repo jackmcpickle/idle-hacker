@@ -129,6 +129,14 @@ export class HackingJob {
         return `${mins}m ${secs}s`;
     }
 
+    getCostPerSecond(): number {
+        return this.cost / (this.duration / 1000);
+    }
+
+    getTotalCost(): number {
+        return this.cost;
+    }
+
     static getAll(): HackingJob[] {
         return HACK_JOBS.map((j) => new HackingJob(j.id));
     }
@@ -144,4 +152,6 @@ export type ActiveHack = {
     jobId: HackJobId;
     startedAt: number;
     endsAt: number;
+    totalCostPaid: number;
+    lastCostTick: number;
 };

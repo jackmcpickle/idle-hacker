@@ -33,7 +33,7 @@ gameRoutes.get('/state', requireAuth, async (c) => {
 });
 
 const syncSchema = z.object({
-    state: z.record(z.unknown()),
+    state: z.record(z.string(), z.unknown()),
 });
 
 gameRoutes.post(

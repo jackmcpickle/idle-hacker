@@ -201,7 +201,7 @@ function SettingsPage(): ReactElement {
                     <div className="mb-2 flex items-center justify-between text-sm">
                         <span className="text-gray-500">Last synced</span>
                         <span>
-                            {new Date(state.lastSyncedAt).toLocaleTimeString()}
+                            {new Date(state.lastSyncedAt).toLocaleString()}
                         </span>
                     </div>
                     <Button
