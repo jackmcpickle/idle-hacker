@@ -46,6 +46,15 @@ export function AuthProvider({
     const fetchUser = useCallback(async () => {
         try {
             const res = await fetch('/api/auth/me', { credentials: 'include' });
+            if (!res.ok) {
+                // API unavailable or error - treat as not authenticated
+                setState({
+                    user: null,
+                    isLoading: false,
+                    isAuthenticated: false,
+                });
+                return;
+            }
             const data = await res.json();
             setState({
                 user: data.user,
