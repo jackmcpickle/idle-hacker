@@ -3,6 +3,7 @@ export async function sendMagicLinkEmail(
     email: string,
     token: string,
     baseUrl: string,
+    pin: string,
     fromEmail?: string,
 ): Promise<boolean> {
     const magicLink = `${baseUrl}/api/auth/verify?token=${token}`;
@@ -22,7 +23,9 @@ export async function sendMagicLinkEmail(
                 <h1>Sign in to Idle Hacker</h1>
                 <p>Click the link below to sign in:</p>
                 <a href="${magicLink}">Sign In</a>
-                <p>This link expires in 15 minutes.</p>
+                <p style="margin-top: 24px;">Or enter this code on a different device:</p>
+                <p style="font-size: 32px; font-weight: bold; letter-spacing: 8px; font-family: monospace; color: #65a30d;">${pin}</p>
+                <p>This link and code expire in 15 minutes.</p>
                 <p>If you didn't request this, ignore this email.</p>
             `,
         }),

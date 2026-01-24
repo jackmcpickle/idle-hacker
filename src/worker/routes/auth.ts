@@ -1,13 +1,19 @@
 import { Hono } from 'hono';
 import { zValidator } from '@hono/zod-validator';
 import { z } from 'zod';
-import { eq } from 'drizzle-orm';
-import { usersTable, sessionsTable, magicLinksTable } from '../../db/schema';
+import { eq, and, isNull, gt, lt } from 'drizzle-orm';
+import {
+    usersTable,
+    sessionsTable,
+    magicLinksTable,
+    pinCodesTable,
+} from '../../db/schema';
 import { createDb } from '../lib/db';
 import { sendMagicLinkEmail } from '../lib/resend';
 import {
     generateMagicLinkToken,
     generateSessionId,
+    generatePinCode,
     getMagicLinkExpiresAt,
     getSessionExpiresAt,
     setSessionCookie,
@@ -29,11 +35,18 @@ authRoutes.post('/send-link', zValidator('json', sendLinkSchema), async (c) => {
     const db = createDb(c.env.TURSO_DATABASE_URL, c.env.TURSO_AUTH_TOKEN);
 
     const token = generateMagicLinkToken();
+    const pin = generatePinCode();
     const expiresAt = getMagicLinkExpiresAt();
 
     await db.insert(magicLinksTable).values({
         token,
         email,
+        expiresAt,
+    });
+
+    await db.insert(pinCodesTable).values({
+        email,
+        pin,
         expiresAt,
     });
 
@@ -43,6 +56,7 @@ authRoutes.post('/send-link', zValidator('json', sendLinkSchema), async (c) => {
         email,
         token,
         baseUrl,
+        pin,
     );
 
     if (!sent) {
@@ -104,6 +118,91 @@ authRoutes.get('/verify', async (c) => {
     setSessionCookie(c, sessionId);
     return c.redirect('/income');
 });
+
+const verifyPinSchema = z.object({
+    email: z.string().email(),
+    pin: z.string().regex(/^\d{6}$/, 'PIN must be 6 digits'),
+});
+
+const MAX_PIN_ATTEMPTS = 5;
+
+authRoutes.post(
+    '/verify-pin',
+    zValidator('json', verifyPinSchema),
+    async (c) => {
+        const { email, pin } = c.req.valid('json');
+        const db = createDb(c.env.TURSO_DATABASE_URL, c.env.TURSO_AUTH_TOKEN);
+
+        // Find the most recent valid PIN code for this email
+        const pinCode = await db
+            .select()
+            .from(pinCodesTable)
+            .where(
+                and(
+                    eq(pinCodesTable.email, email),
+                    isNull(pinCodesTable.usedAt),
+                    gt(pinCodesTable.expiresAt, new Date()),
+                    lt(pinCodesTable.attempts, MAX_PIN_ATTEMPTS),
+                ),
+            )
+            .get();
+
+        if (!pinCode) {
+            return c.json({ error: 'Invalid or expired code' }, 400);
+        }
+
+        // Check if PIN matches
+        if (pinCode.pin !== pin) {
+            await db
+                .update(pinCodesTable)
+                .set({ attempts: pinCode.attempts + 1 })
+                .where(eq(pinCodesTable.id, pinCode.id));
+
+            const attemptsLeft = MAX_PIN_ATTEMPTS - pinCode.attempts - 1;
+            if (attemptsLeft <= 0) {
+                return c.json(
+                    { error: 'Too many attempts. Request a new code.' },
+                    400,
+                );
+            }
+            return c.json({ error: 'Invalid code' }, 400);
+        }
+
+        await db
+            .update(pinCodesTable)
+            .set({ usedAt: new Date() })
+            .where(eq(pinCodesTable.id, pinCode.id));
+
+        let user = await db
+            .select()
+            .from(usersTable)
+            .where(eq(usersTable.email, email))
+            .get();
+
+        if (!user) {
+            const result = await db
+                .insert(usersTable)
+                .values({
+                    email,
+                    name: email.split('@')[0],
+                })
+                .returning();
+            user = result[0];
+        }
+
+        const sessionId = generateSessionId();
+        const expiresAt = getSessionExpiresAt();
+
+        await db.insert(sessionsTable).values({
+            id: sessionId,
+            userId: user.id,
+            expiresAt,
+        });
+
+        setSessionCookie(c, sessionId);
+        return c.json({ success: true });
+    },
+);
 
 authRoutes.post('/logout', requireAuth, async (c) => {
     const sessionId = c.get('sessionId');

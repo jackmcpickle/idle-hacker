@@ -43,3 +43,15 @@ export const gameStatesTable = sqliteTable('game_states_table', {
         .notNull()
         .$defaultFn(() => new Date()),
 });
+
+export const pinCodesTable = sqliteTable('pin_codes_table', {
+    id: int().primaryKey({ autoIncrement: true }),
+    email: text().notNull(),
+    pin: text().notNull(),
+    expiresAt: int({ mode: 'timestamp' }).notNull(),
+    usedAt: int({ mode: 'timestamp' }),
+    attempts: int().notNull().default(0),
+    createdAt: int({ mode: 'timestamp' })
+        .notNull()
+        .$defaultFn(() => new Date()),
+});

@@ -45,3 +45,10 @@ export function getSessionExpiresAt(): Date {
 export function getMagicLinkExpiresAt(): Date {
     return new Date(Date.now() + 15 * 60 * 1000); // 15 mins
 }
+
+export function generatePinCode(): string {
+    const array = new Uint32Array(1);
+    crypto.getRandomValues(array);
+    const pin = array[0] % 1000000;
+    return pin.toString().padStart(6, '0');
+}

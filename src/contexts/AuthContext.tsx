@@ -26,6 +26,10 @@ type AuthContextValue = AuthState & {
     sendMagicLink: (
         email: string,
     ) => Promise<{ success: boolean; error?: string }>;
+    verifyPin: (
+        email: string,
+        pin: string,
+    ) => Promise<{ success: boolean; error?: string }>;
     logout: () => Promise<void>;
     refetchUser: () => Promise<void>;
 };
@@ -93,6 +97,31 @@ export function AuthProvider({
         }
     }
 
+    async function verifyPin(
+        email: string,
+        pin: string,
+    ): Promise<{ success: boolean; error?: string }> {
+        try {
+            const res = await fetch('/api/auth/verify-pin', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, pin }),
+                credentials: 'include',
+            });
+            if (!res.ok) {
+                const data = await res.json();
+                return {
+                    success: false,
+                    error: data.error || 'Invalid code',
+                };
+            }
+            await fetchUser();
+            return { success: true };
+        } catch {
+            return { success: false, error: 'Network error' };
+        }
+    }
+
     async function handleLogout(): Promise<void> {
         try {
             await fetch('/api/auth/logout', {
@@ -109,6 +138,7 @@ export function AuthProvider({
             value={{
                 ...state,
                 sendMagicLink,
+                verifyPin,
                 logout: handleLogout,
                 refetchUser: fetchUser,
             }}
