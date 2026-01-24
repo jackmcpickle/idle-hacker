@@ -20,7 +20,7 @@ const HARDWARE_CONFIGS: HardwareConfig[] = [
         name: 'CPU',
         description: 'Faster processing, faster income',
         baseCost: 100,
-        speedBonusPerLevel: 0.05,
+        speedBonusPerLevel: 0.1,
         maxLevel: 10,
         unlockHackTier: 1,
         icon: Cpu,
@@ -30,7 +30,7 @@ const HARDWARE_CONFIGS: HardwareConfig[] = [
         name: 'RAM',
         description: 'More memory, more parallel tasks',
         baseCost: 150,
-        speedBonusPerLevel: 0.03,
+        speedBonusPerLevel: 0.08,
         maxLevel: 10,
         unlockHackTier: 1,
         icon: MemoryStick,
@@ -40,7 +40,7 @@ const HARDWARE_CONFIGS: HardwareConfig[] = [
         name: 'Storage',
         description: 'Store more data for bigger jobs',
         baseCost: 200,
-        speedBonusPerLevel: 0.02,
+        speedBonusPerLevel: 0.06,
         maxLevel: 10,
         unlockHackTier: 2,
         icon: HardDrive,
@@ -50,7 +50,7 @@ const HARDWARE_CONFIGS: HardwareConfig[] = [
         name: 'Network Card',
         description: 'Faster connection speeds',
         baseCost: 300,
-        speedBonusPerLevel: 0.04,
+        speedBonusPerLevel: 0.08,
         maxLevel: 10,
         unlockHackTier: 2,
         icon: Wifi,
@@ -60,7 +60,7 @@ const HARDWARE_CONFIGS: HardwareConfig[] = [
         name: 'Router',
         description: 'Better routing, harder to trace',
         baseCost: 500,
-        speedBonusPerLevel: 0.03,
+        speedBonusPerLevel: 0.08,
         maxLevel: 10,
         unlockHackTier: 3,
         icon: Router,
@@ -94,7 +94,8 @@ export class HardwareItem {
     }
 
     getCost(): number {
-        return Math.floor(this.baseCost * Math.pow(2, this.level));
+        // Use 1.5^level for softer scaling (vs 2^level which was too aggressive)
+        return Math.floor(this.baseCost * Math.pow(1.5, this.level));
     }
 
     getSpeedBonus(): number {
