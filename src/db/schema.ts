@@ -45,7 +45,7 @@ export const gameStatesTable = sqliteTable('game_states_table', {
 });
 
 export const pinCodesTable = sqliteTable('pin_codes_table', {
-    id: int().primaryKey({ autoIncrement: true }),
+    id: int().primaryKey(),
     email: text().notNull(),
     pin: text().notNull(),
     expiresAt: int({ mode: 'timestamp' }).notNull(),
