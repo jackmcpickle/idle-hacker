@@ -31,92 +31,116 @@ const sendLinkSchema = z.object({
 });
 
 authRoutes.post('/send-link', zValidator('json', sendLinkSchema), async (c) => {
-    const { email } = c.req.valid('json');
-    const db = createDb(c.env.TURSO_DATABASE_URL, c.env.TURSO_AUTH_TOKEN);
+    try {
+        const { email } = c.req.valid('json');
+        const db = createDb(c.env.TURSO_DATABASE_URL, c.env.TURSO_AUTH_TOKEN);
 
-    const token = generateMagicLinkToken();
-    const pin = generatePinCode();
-    const expiresAt = getMagicLinkExpiresAt();
+        const token = generateMagicLinkToken();
+        const pin = generatePinCode();
+        const expiresAt = getMagicLinkExpiresAt();
 
-    await db.insert(magicLinksTable).values({
-        token,
-        email,
-        expiresAt,
-    });
+        const now = new Date();
 
-    await db.insert(pinCodesTable).values({
-        email,
-        pin,
-        expiresAt,
-    });
+        await db.insert(magicLinksTable).values({
+            token,
+            email,
+            expiresAt,
+            createdAt: now,
+        });
 
-    const baseUrl = new URL(c.req.url).origin;
-    const sent = await sendMagicLinkEmail(
-        c.env.RESEND_API_KEY,
-        email,
-        token,
-        baseUrl,
-        pin,
-    );
+        await db.insert(pinCodesTable).values({
+            email,
+            pin,
+            expiresAt,
+            createdAt: now,
+        });
 
-    if (!sent) {
-        return c.json({ error: 'Failed to send email' }, 500);
+        const baseUrl = new URL(c.req.url).origin;
+        const sent = await sendMagicLinkEmail(
+            c.env.RESEND_API_KEY,
+            email,
+            token,
+            baseUrl,
+            pin,
+        );
+
+        if (!sent) {
+            return c.json({ error: 'Failed to send email' }, 500);
+        }
+
+        return c.json({ success: true });
+    } catch (error) {
+        console.error('send-link error:', error);
+        const message =
+            error instanceof Error ? error.message : 'Unknown error';
+        return c.json({ error: message }, 500);
     }
-
-    return c.json({ success: true });
 });
 
 authRoutes.get('/verify', async (c) => {
-    const token = c.req.query('token');
-    if (!token) {
-        return c.redirect('/login?error=invalid_token');
+    try {
+        const token = c.req.query('token');
+        if (!token) {
+            return c.redirect('/login?error=invalid_token');
+        }
+
+        const db = createDb(c.env.TURSO_DATABASE_URL, c.env.TURSO_AUTH_TOKEN);
+
+        const magicLink = await db
+            .select()
+            .from(magicLinksTable)
+            .where(eq(magicLinksTable.token, token))
+            .get();
+
+        if (
+            !magicLink ||
+            magicLink.usedAt ||
+            magicLink.expiresAt < new Date()
+        ) {
+            return c.redirect('/login?error=invalid_token');
+        }
+
+        await db
+            .update(magicLinksTable)
+            .set({ usedAt: new Date() })
+            .where(eq(magicLinksTable.token, token));
+
+        let user = await db
+            .select()
+            .from(usersTable)
+            .where(eq(usersTable.email, magicLink.email))
+            .get();
+
+        const now = new Date();
+
+        if (!user) {
+            const result = await db
+                .insert(usersTable)
+                .values({
+                    email: magicLink.email,
+                    name: magicLink.email.split('@')[0],
+                    createdAt: now,
+                })
+                .returning();
+            user = result[0];
+        }
+
+        const sessionId = generateSessionId();
+        const expiresAt = getSessionExpiresAt();
+
+        await db.insert(sessionsTable).values({
+            id: sessionId,
+            userId: user.id,
+            expiresAt,
+            createdAt: now,
+        });
+
+        setSessionCookie(c, sessionId);
+        return c.redirect('/income');
+    } catch (error) {
+        console.error('verify error:', error);
+        return c.redirect('/login?error=server_error');
     }
-
-    const db = createDb(c.env.TURSO_DATABASE_URL, c.env.TURSO_AUTH_TOKEN);
-
-    const magicLink = await db
-        .select()
-        .from(magicLinksTable)
-        .where(eq(magicLinksTable.token, token))
-        .get();
-
-    if (!magicLink || magicLink.usedAt || magicLink.expiresAt < new Date()) {
-        return c.redirect('/login?error=invalid_token');
-    }
-
-    await db
-        .update(magicLinksTable)
-        .set({ usedAt: new Date() })
-        .where(eq(magicLinksTable.token, token));
-
-    let user = await db
-        .select()
-        .from(usersTable)
-        .where(eq(usersTable.email, magicLink.email))
-        .get();
-
-    if (!user) {
-        const result = await db
-            .insert(usersTable)
-            .values({
-                email: magicLink.email,
-                name: magicLink.email.split('@')[0],
-            })
-            .returning();
-        user = result[0];
-    }
-
-    const sessionId = generateSessionId();
-    const expiresAt = getSessionExpiresAt();
-
-    await db.insert(sessionsTable).values({
-        id: sessionId,
-        userId: user.id,
-        expiresAt,
-    });
-
-    setSessionCookie(c, sessionId);
-    return c.redirect('/income');
 });
 
 const verifyPinSchema = z.object({
@@ -130,77 +154,91 @@ authRoutes.post(
     '/verify-pin',
     zValidator('json', verifyPinSchema),
     async (c) => {
-        const { email, pin } = c.req.valid('json');
-        const db = createDb(c.env.TURSO_DATABASE_URL, c.env.TURSO_AUTH_TOKEN);
+        try {
+            const { email, pin } = c.req.valid('json');
+            const db = createDb(
+                c.env.TURSO_DATABASE_URL,
+                c.env.TURSO_AUTH_TOKEN,
+            );
 
-        // Find the most recent valid PIN code for this email
-        const pinCode = await db
-            .select()
-            .from(pinCodesTable)
-            .where(
-                and(
-                    eq(pinCodesTable.email, email),
-                    isNull(pinCodesTable.usedAt),
-                    gt(pinCodesTable.expiresAt, new Date()),
-                    lt(pinCodesTable.attempts, MAX_PIN_ATTEMPTS),
-                ),
-            )
-            .get();
+            // Find the most recent valid PIN code for this email
+            const pinCode = await db
+                .select()
+                .from(pinCodesTable)
+                .where(
+                    and(
+                        eq(pinCodesTable.email, email),
+                        isNull(pinCodesTable.usedAt),
+                        gt(pinCodesTable.expiresAt, new Date()),
+                        lt(pinCodesTable.attempts, MAX_PIN_ATTEMPTS),
+                    ),
+                )
+                .get();
 
-        if (!pinCode) {
-            return c.json({ error: 'Invalid or expired code' }, 400);
-        }
+            if (!pinCode) {
+                return c.json({ error: 'Invalid or expired code' }, 400);
+            }
 
-        // Check if PIN matches
-        if (pinCode.pin !== pin) {
+            // Check if PIN matches
+            if (pinCode.pin !== pin) {
+                await db
+                    .update(pinCodesTable)
+                    .set({ attempts: pinCode.attempts + 1 })
+                    .where(eq(pinCodesTable.id, pinCode.id));
+
+                const attemptsLeft = MAX_PIN_ATTEMPTS - pinCode.attempts - 1;
+                if (attemptsLeft <= 0) {
+                    return c.json(
+                        { error: 'Too many attempts. Request a new code.' },
+                        400,
+                    );
+                }
+                return c.json({ error: 'Invalid code' }, 400);
+            }
+
             await db
                 .update(pinCodesTable)
-                .set({ attempts: pinCode.attempts + 1 })
+                .set({ usedAt: new Date() })
                 .where(eq(pinCodesTable.id, pinCode.id));
 
-            const attemptsLeft = MAX_PIN_ATTEMPTS - pinCode.attempts - 1;
-            if (attemptsLeft <= 0) {
-                return c.json(
-                    { error: 'Too many attempts. Request a new code.' },
-                    400,
-                );
+            const now = new Date();
+
+            let user = await db
+                .select()
+                .from(usersTable)
+                .where(eq(usersTable.email, email))
+                .get();
+
+            if (!user) {
+                const result = await db
+                    .insert(usersTable)
+                    .values({
+                        email,
+                        name: email.split('@')[0],
+                        createdAt: now,
+                    })
+                    .returning();
+                user = result[0];
             }
-            return c.json({ error: 'Invalid code' }, 400);
+
+            const sessionId = generateSessionId();
+            const expiresAt = getSessionExpiresAt();
+
+            await db.insert(sessionsTable).values({
+                id: sessionId,
+                userId: user.id,
+                expiresAt,
+                createdAt: now,
+            });
+
+            setSessionCookie(c, sessionId);
+            return c.json({ success: true });
+        } catch (error) {
+            console.error('verify-pin error:', error);
+            const message =
+                error instanceof Error ? error.message : 'Unknown error';
+            return c.json({ error: message }, 500);
         }
-
-        await db
-            .update(pinCodesTable)
-            .set({ usedAt: new Date() })
-            .where(eq(pinCodesTable.id, pinCode.id));
-
-        let user = await db
-            .select()
-            .from(usersTable)
-            .where(eq(usersTable.email, email))
-            .get();
-
-        if (!user) {
-            const result = await db
-                .insert(usersTable)
-                .values({
-                    email,
-                    name: email.split('@')[0],
-                })
-                .returning();
-            user = result[0];
-        }
-
-        const sessionId = generateSessionId();
-        const expiresAt = getSessionExpiresAt();
-
-        await db.insert(sessionsTable).values({
-            id: sessionId,
-            userId: user.id,
-            expiresAt,
-        });
-
-        setSessionCookie(c, sessionId);
-        return c.json({ success: true });
     },
 );
 
