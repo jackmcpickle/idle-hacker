@@ -157,6 +157,7 @@ export function calculateOfflineProgress(
             influenceEarned: 0,
             completedHackJobIds: [],
             completedActiveHackSlots: [],
+            hackCostsPaid: 0,
         };
     }
 

@@ -12,6 +12,7 @@ export const SET_LAST_SYNCED = 'SET_LAST_SYNCED';
 export const GAME_TICK = 'GAME_TICK';
 export const APPLY_OFFLINE_PROGRESS = 'APPLY_OFFLINE_PROGRESS';
 export const RESET_GAME = 'RESET_GAME';
+export const CLEAR_COMPLETED_HACKS = 'CLEAR_COMPLETED_HACKS';
 
 export const increaseQty = (
     name: string,
@@ -98,4 +99,8 @@ export const applyOfflineProgress = (
 
 export const resetGame = (): { type: typeof RESET_GAME } => ({
     type: RESET_GAME,
+});
+
+export const clearCompletedHacks = (): { type: typeof CLEAR_COMPLETED_HACKS } => ({
+    type: CLEAR_COMPLETED_HACKS,
 });

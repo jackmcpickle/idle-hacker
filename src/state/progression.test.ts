@@ -71,12 +71,15 @@ describe('Progression Milestones', () => {
 
     it('hardware costs scale at 1.5x per level', () => {
         const cpu = state.hardware.find((h) => h.id === 'cpu');
-        expect(cpu?.getCost()).toBe(100); // Level 0
+        expect(cpu).toBeDefined();
+        if (!cpu) throw new Error('cpu hardware not found');
 
-        cpu?.upgrade();
-        expect(cpu?.getCost()).toBe(150); // Level 1: 100 * 1.5
+        expect(cpu.getCost()).toBe(100); // Level 0
 
-        cpu?.upgrade();
-        expect(cpu?.getCost()).toBe(225); // Level 2: 100 * 1.5^2
+        cpu.upgrade();
+        expect(cpu.getCost()).toBe(150); // Level 1: 100 * 1.5
+
+        cpu.upgrade();
+        expect(cpu.getCost()).toBe(225); // Level 2: 100 * 1.5^2
     });
 });

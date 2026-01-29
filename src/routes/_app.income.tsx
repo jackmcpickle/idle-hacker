@@ -15,8 +15,9 @@ function IncomePage(): ReactElement {
 
     const totalIncomePerSec = state.incomeTypes.reduce((sum, inc) => {
         if (!inc.hasInventory()) return sum;
-        const incomePerCycle = inc.getIncome().real();
         const cycleTime = inc.getCountdown() / 1000;
+        if (cycleTime <= 0) return sum;
+        const incomePerCycle = inc.getIncome().real();
         return sum + incomePerCycle / cycleTime;
     }, 0);
 

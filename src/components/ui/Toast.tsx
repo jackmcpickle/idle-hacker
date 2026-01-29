@@ -41,6 +41,7 @@ export function Toast({ toast, onDismiss }: Props): ReactElement {
             </div>
             <button
                 type="button"
+                aria-label="Dismiss notification"
                 onClick={() => onDismiss(toast.id)}
                 className="shrink-0 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
             >

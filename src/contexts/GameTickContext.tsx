@@ -1,6 +1,6 @@
 import { useEffect, useRef, type ReactElement, type ReactNode } from 'react';
 import { useGlobalStateProvider } from '@/state/context';
-import { gameTick } from '@/state/actions';
+import { gameTick, clearCompletedHacks } from '@/state/actions';
 import { useToast } from '@/contexts/ToastContext';
 import { useSettings } from '@/contexts/SettingsContext';
 
@@ -30,14 +30,15 @@ export function GameTickProvider({
 
     // Show toast for completed hacks
     useEffect(() => {
-        if (!notificationsEnabled) return;
+        if (!notificationsEnabled || state.completedHacks.length === 0) return;
         for (const hack of state.completedHacks) {
             showToast(
                 `${hack.jobName} Complete!`,
                 `+${hack.influenceReward} Influence`,
             );
         }
-    }, [state.completedHacks, showToast, notificationsEnabled]);
+        dispatch(clearCompletedHacks());
+    }, [state.completedHacks, showToast, notificationsEnabled, dispatch]);
 
     return <>{children}</>;
 }
