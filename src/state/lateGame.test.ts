@@ -119,7 +119,7 @@ describe('Late Game State', () => {
             jobId: 'wifi-crack',
             startedAt: startTime,
             endsAt: startTime + 60000, // 60 second hack
-            totalCostPaid: 250, // Fully paid
+            totalCostPaid: 100, // Fully paid
             lastCostTick: startTime,
         };
 
@@ -132,7 +132,7 @@ describe('Late Game State', () => {
             data: { now: afterComplete },
         });
 
-        expect(newState.influence).toBe(initialInfluence + 15); // wifi-crack = 15 influence
+        expect(newState.influence).toBe(initialInfluence + 10); // wifi-crack = 10 influence
         expect(newState.totalHacksCompleted).toBe(51);
         expect(newState.activeHacks[0]).toBeNull();
         expect(newState.completedHacks).toHaveLength(1);

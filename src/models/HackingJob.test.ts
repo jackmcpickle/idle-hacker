@@ -8,8 +8,8 @@ describe('HackingJob', () => {
             expect(job.id).toBe('wifi-crack');
             expect(job.name).toBe('Crack WiFi');
             expect(job.duration).toBe(60_000);
-            expect(job.cost).toBe(250);
-            expect(job.influenceReward).toBe(15);
+            expect(job.cost).toBe(100);
+            expect(job.influenceReward).toBe(10);
             expect(job.tier).toBe(1);
         });
 
