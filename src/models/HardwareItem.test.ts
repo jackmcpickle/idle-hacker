@@ -25,18 +25,18 @@ describe('HardwareItem', () => {
     describe('getCost', () => {
         it('returns base cost at level 0', () => {
             const hw = new HardwareItem('cpu');
-            expect(hw.getCost()).toBe(100);
+            expect(hw.getCost()).toBe(1_000);
         });
 
-        it('increases cost by 1.5x per level', () => {
+        it('increases cost by 3x per level', () => {
             const hw = new HardwareItem('cpu', 1);
-            expect(hw.getCost()).toBe(150); // 100 * 1.5^1
+            expect(hw.getCost()).toBe(3_000); // 1000 * 3^1
 
             const hw2 = new HardwareItem('cpu', 2);
-            expect(hw2.getCost()).toBe(225); // 100 * 1.5^2
+            expect(hw2.getCost()).toBe(9_000); // 1000 * 3^2
 
             const hw3 = new HardwareItem('cpu', 3);
-            expect(hw3.getCost()).toBe(337); // floor(100 * 1.5^3)
+            expect(hw3.getCost()).toBe(27_000); // 1000 * 3^3
         });
     });
 
