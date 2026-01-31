@@ -67,8 +67,8 @@ describe('Early Game State', () => {
     });
 
     it('can upgrade hardware when affordable', () => {
-        // Give player money for CPU upgrade (costs 100)
-        state = gameReducer(state, { type: COLLECT_INCOME, data: 150 });
+        // Give player money for CPU upgrade (costs 1000)
+        state = gameReducer(state, { type: COLLECT_INCOME, data: 1500 });
 
         const newState = gameReducer(state, {
             type: UPGRADE_HARDWARE,
@@ -77,8 +77,8 @@ describe('Early Game State', () => {
 
         const cpu = newState.hardware.find((h) => h.id === 'cpu');
         expect(cpu?.level).toBe(1);
-        expect(newState.bank).toBe(50);
-        expect(newState.totalSpent).toBe(100);
+        expect(newState.bank).toBe(500);
+        expect(newState.totalSpent).toBe(1000);
     });
 
     it('cannot start hack without required hardware', () => {
@@ -93,8 +93,8 @@ describe('Early Game State', () => {
     });
 
     it('can start hack after upgrading hardware', () => {
-        // Upgrade CPU to level 1
-        state = gameReducer(state, { type: COLLECT_INCOME, data: 500 });
+        // Upgrade CPU to level 1 (costs 1000)
+        state = gameReducer(state, { type: COLLECT_INCOME, data: 1500 });
         state = gameReducer(state, { type: UPGRADE_HARDWARE, data: 'cpu' });
 
         const newState = gameReducer(state, {

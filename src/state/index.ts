@@ -138,58 +138,58 @@ export const INCOME_TYPES = [
     }),
     new IncomeType({
         name: 'Freelance Tasks',
-        cost: 30,
-        income: 8,
+        cost: 1_000,
+        income: 500,
         countdown: 6000,
-        unlockIncome: 500,
+        unlockIncome: 1_000,
         icon: Briefcase,
     }),
     new IncomeType({
         name: 'Resume Updates',
-        cost: 80,
-        income: 15,
+        cost: 100_000,
+        income: 50_000,
         countdown: 8000,
-        unlockIncome: 2000,
+        unlockIncome: 100_000,
         icon: FileText,
     }),
     new IncomeType({
         name: 'Bug Bounties',
-        cost: 200,
-        income: 40,
+        cost: 10_000_000,
+        income: 5_000_000,
         countdown: 15000,
-        unlockIncome: 10000,
+        unlockIncome: 10_000_000,
         icon: Bug,
     }),
     new IncomeType({
         name: 'Basic Website',
-        cost: 600,
-        income: 100,
+        cost: 1_000_000_000,
+        income: 500_000_000,
         countdown: 30000,
-        unlockIncome: 50000,
+        unlockIncome: 1_000_000_000,
         icon: Globe,
     }),
     new IncomeType({
         name: 'Consulting',
-        cost: 2000,
-        income: 350,
+        cost: 100_000_000_000,
+        income: 50_000_000_000,
         countdown: 45000,
-        unlockIncome: 250000,
+        unlockIncome: 100_000_000_000,
         icon: Users,
     }),
     new IncomeType({
         name: 'E-commerce Site',
-        cost: 8000,
-        income: 1200,
+        cost: 10_000_000_000_000,
+        income: 5_000_000_000_000,
         countdown: 60000,
-        unlockIncome: 1500000,
+        unlockIncome: 10_000_000_000_000,
         icon: CircleDollarSign,
     }),
     new IncomeType({
         name: 'SaaS Platform',
-        cost: 30000,
-        income: 5000,
+        cost: 1_000_000_000_000_000,
+        income: 500_000_000_000_000,
         countdown: 90000,
-        unlockIncome: 10000000,
+        unlockIncome: 1_000_000_000_000_000,
         icon: Cloud,
     }),
 ];
@@ -221,7 +221,10 @@ function calculateMaxHackSlots(hardware: HardwareItem[]): number {
     return 1 + Math.floor(ramLevel / 3);
 }
 
-function handleUpgradeHardware(state: GameContext, id: HardwareId): GameContext {
+function handleUpgradeHardware(
+    state: GameContext,
+    id: HardwareId,
+): GameContext {
     const hw = state.hardware.find((h) => h.id === id);
     if (!hw || !hw.canUpgrade()) return state;
     const cost = hw.getCost();

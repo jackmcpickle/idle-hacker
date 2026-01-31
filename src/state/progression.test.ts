@@ -10,23 +10,23 @@ describe('Progression Milestones', () => {
         state = createFreshState();
     });
 
-    it('unlocks Freelance Tasks at 500 total earned', () => {
+    it('unlocks Freelance Tasks at 1000 total earned', () => {
         const freelance = state.incomeTypes.find(
             (i) => i.name === 'Freelance Tasks',
         );
-        expect(freelance?.unlockIncome).toBe(500);
+        expect(freelance?.unlockIncome).toBe(1_000);
     });
 
-    it('unlocks Bug Bounties at 10000 total earned', () => {
+    it('unlocks Bug Bounties at 10000000 total earned', () => {
         const bugBounties = state.incomeTypes.find(
             (i) => i.name === 'Bug Bounties',
         );
-        expect(bugBounties?.unlockIncome).toBe(10000);
+        expect(bugBounties?.unlockIncome).toBe(10_000_000);
     });
 
-    it('unlocks SaaS Platform at 10000000 total earned', () => {
+    it('unlocks SaaS Platform at 1 quadrillion total earned', () => {
         const saas = state.incomeTypes.find((i) => i.name === 'SaaS Platform');
-        expect(saas?.unlockIncome).toBe(10000000);
+        expect(saas?.unlockIncome).toBe(1_000_000_000_000_000);
     });
 
     it('level multipliers scale correctly', () => {
@@ -69,17 +69,17 @@ describe('Progression Milestones', () => {
         expect(incomeType.incomeMultiplier).toBe(4);
     });
 
-    it('hardware costs scale at 1.5x per level', () => {
+    it('hardware costs scale at 3x per level', () => {
         const cpu = state.hardware.find((h) => h.id === 'cpu');
         expect(cpu).toBeDefined();
         if (!cpu) throw new Error('cpu hardware not found');
 
-        expect(cpu.getCost()).toBe(100); // Level 0
+        expect(cpu.getCost()).toBe(1_000); // Level 0
 
         cpu.upgrade();
-        expect(cpu.getCost()).toBe(150); // Level 1: 100 * 1.5
+        expect(cpu.getCost()).toBe(3_000); // Level 1: 1000 * 3
 
         cpu.upgrade();
-        expect(cpu.getCost()).toBe(225); // Level 2: 100 * 1.5^2
+        expect(cpu.getCost()).toBe(9_000); // Level 2: 1000 * 3^2
     });
 });

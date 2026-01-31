@@ -9,8 +9,8 @@ describe('Mid Game State', () => {
     beforeEach(() => {
         state = createFreshState();
         // Set up mid-game state: some money, inventory, and hardware
-        state.bank = 5000;
-        state.totalEarned = 15000;
+        state.bank = 500_000_000;
+        state.totalEarned = 1_000_000_000;
         state.incomeTypes[0].addInventory(24); // 25 total Business Cards (hits 1.25x multiplier)
         state.incomeTypes[1].addInventory(10); // 10 Freelance Tasks
     });
@@ -26,15 +26,17 @@ describe('Mid Game State', () => {
 
     it('can upgrade multiple hardware pieces', () => {
         // Upgrade CPU twice, RAM once
-        state = gameReducer(state, { type: UPGRADE_HARDWARE, data: 'cpu' }); // 100
-        state = gameReducer(state, { type: UPGRADE_HARDWARE, data: 'cpu' }); // 150
-        state = gameReducer(state, { type: UPGRADE_HARDWARE, data: 'ram' }); // 150
+        // CPU: 1000, 3000 = 4000
+        // RAM: 10000
+        state = gameReducer(state, { type: UPGRADE_HARDWARE, data: 'cpu' }); // 1000
+        state = gameReducer(state, { type: UPGRADE_HARDWARE, data: 'cpu' }); // 3000
+        state = gameReducer(state, { type: UPGRADE_HARDWARE, data: 'ram' }); // 10000
 
         const cpu = state.hardware.find((h) => h.id === 'cpu');
         const ram = state.hardware.find((h) => h.id === 'ram');
         expect(cpu?.level).toBe(2);
         expect(ram?.level).toBe(1);
-        expect(state.bank).toBe(4600); // 5000 - 100 - 150 - 150
+        expect(state.bank).toBe(500_000_000 - 1000 - 3000 - 10000);
     });
 
     it('hardware speed bonus affects income countdown', () => {
@@ -55,9 +57,10 @@ describe('Mid Game State', () => {
 
     it('RAM upgrades increase hack slots', () => {
         // Need RAM level 3 for 2 slots
-        state = gameReducer(state, { type: UPGRADE_HARDWARE, data: 'ram' }); // 150
-        state = gameReducer(state, { type: UPGRADE_HARDWARE, data: 'ram' }); // 225
-        state = gameReducer(state, { type: UPGRADE_HARDWARE, data: 'ram' }); // 337
+        // RAM: 10000, 30000, 90000
+        state = gameReducer(state, { type: UPGRADE_HARDWARE, data: 'ram' }); // 10000
+        state = gameReducer(state, { type: UPGRADE_HARDWARE, data: 'ram' }); // 30000
+        state = gameReducer(state, { type: UPGRADE_HARDWARE, data: 'ram' }); // 90000
 
         expect(state.maxHackSlots).toBe(2);
         expect(state.activeHacks).toHaveLength(2);
@@ -65,6 +68,9 @@ describe('Mid Game State', () => {
 
     it('can run multiple hacks with enough slots and hardware', () => {
         // Upgrade hardware for hack requirements
+        // CPU: 1000, 3000 = 4000 total
+        // RAM: 10000, 30000, 90000 = 130000 total
+        // Network: 1000000
         state = gameReducer(state, { type: UPGRADE_HARDWARE, data: 'cpu' }); // level 1
         state = gameReducer(state, { type: UPGRADE_HARDWARE, data: 'cpu' }); // level 2
         state = gameReducer(state, { type: UPGRADE_HARDWARE, data: 'ram' }); // level 1
@@ -90,7 +96,7 @@ describe('Mid Game State', () => {
     });
 
     it('game tick with hardware bonus collects faster', () => {
-        // Upgrade CPU for speed bonus
+        // Upgrade CPU for speed bonus (costs 1000)
         state = gameReducer(state, { type: UPGRADE_HARDWARE, data: 'cpu' }); // 0.1 bonus
 
         const now = Date.now();
@@ -111,7 +117,7 @@ describe('Mid Game State', () => {
     });
 
     it('hack drains cost over time during game tick', () => {
-        // Setup for hack
+        // Setup for hack (CPU costs 1000)
         state = gameReducer(state, { type: UPGRADE_HARDWARE, data: 'cpu' });
 
         // Start hack
@@ -132,7 +138,7 @@ describe('Mid Game State', () => {
             data: { now: startTime + 10000 },
         });
 
-        // Cost should be drained (wifi-crack costs 250 over 60s = ~4.17/sec)
+        // Cost should be drained (wifi-crack costs 100 over 60s = ~1.67/sec)
         expect(newState.bank).toBeLessThan(initialBank);
         expect(newState.activeHacks[0]?.totalCostPaid).toBeGreaterThan(0);
     });

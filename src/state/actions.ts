@@ -101,6 +101,8 @@ export const resetGame = (): { type: typeof RESET_GAME } => ({
     type: RESET_GAME,
 });
 
-export const clearCompletedHacks = (): { type: typeof CLEAR_COMPLETED_HACKS } => ({
+export const clearCompletedHacks = (): {
+    type: typeof CLEAR_COMPLETED_HACKS;
+} => ({
     type: CLEAR_COMPLETED_HACKS,
 });
