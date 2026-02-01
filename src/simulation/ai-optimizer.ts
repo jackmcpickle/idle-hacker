@@ -6,10 +6,18 @@
  */
 
 import type { BalanceConfig, ConfigAdjustment } from './config';
-import { DEFAULT_BALANCE_CONFIG, cloneConfig, applyConfigAdjustments } from './config';
+import {
+    DEFAULT_BALANCE_CONFIG,
+    cloneConfig,
+    applyConfigAdjustments,
+} from './config';
 import { runBatchSimulation } from './runner';
 import { getAllStrategies } from './strategies';
-import { generateAIReport, parseAdjustments, generateFinalReport } from './report';
+import {
+    generateAIReport,
+    parseAdjustments,
+    generateFinalReport,
+} from './report';
 
 const ANTHROPIC_API_URL = 'https://api.anthropic.com/v1/messages';
 const MODEL_ID = 'claude-haiku-4-5-20250514';
@@ -105,7 +113,9 @@ Example: [{"type": "income_cost", "target": "Freelance Tasks", "percent": -15}]`
 
     if (!response.ok) {
         const errorText = await response.text();
-        throw new Error(`Anthropic API error: ${response.status} - ${errorText}`);
+        throw new Error(
+            `Anthropic API error: ${response.status} - ${errorText}`,
+        );
     }
 
     const data = await response.json();
@@ -157,12 +167,19 @@ export async function runAIOptimization(
 
             // Generate report
             const report = generateAIReport(batchResult, iterNum);
-            onProgress(`Average progression score: ${batchResult.summary.overallAvgScore.toFixed(2)}`);
+            onProgress(
+                `Average progression score: ${batchResult.summary.overallAvgScore.toFixed(2)}`,
+            );
             onProgress(`Best strategy: ${batchResult.summary.bestStrategy}`);
 
             // Call AI for adjustments
             onProgress(`Calling Claude Haiku 4.5 for analysis...`);
-            const aiResponse = await callAnthropicAPI(apiKey, report, iterNum, maxIterations);
+            const aiResponse = await callAnthropicAPI(
+                apiKey,
+                report,
+                iterNum,
+                maxIterations,
+            );
             totalApiCalls++;
 
             // Parse adjustments
@@ -170,11 +187,16 @@ export async function runAIOptimization(
             onProgress(`AI suggested ${adjustments.length} adjustments:`);
             for (const adj of adjustments) {
                 const target = adj.target ? ` on ${adj.target}` : '';
-                onProgress(`  - ${adj.type}${target}: ${adj.percent >= 0 ? '+' : ''}${adj.percent}%`);
+                onProgress(
+                    `  - ${adj.type}${target}: ${adj.percent >= 0 ? '+' : ''}${adj.percent}%`,
+                );
             }
 
             // Apply adjustments
-            const configAfter = applyConfigAdjustments(currentConfig, adjustments);
+            const configAfter = applyConfigAdjustments(
+                currentConfig,
+                adjustments,
+            );
 
             // Store iteration result
             iterations.push({
@@ -190,7 +212,9 @@ export async function runAIOptimization(
 
             // Check for convergence (if AI suggests no changes)
             if (adjustments.length === 0) {
-                onProgress(`\nAI suggested no changes - optimization complete!`);
+                onProgress(
+                    `\nAI suggested no changes - optimization complete!`,
+                );
                 break;
             }
         }
@@ -216,8 +240,12 @@ export async function runAIOptimization(
         onProgress('='.repeat(60));
         onProgress(`Total iterations: ${iterations.length}`);
         onProgress(`Total API calls: ${totalApiCalls}`);
-        onProgress(`Starting score: ${iterations[0]?.avgScore.toFixed(2) ?? 'N/A'}`);
-        onProgress(`Final score: ${iterations[iterations.length - 1]?.avgScore.toFixed(2) ?? 'N/A'}`);
+        onProgress(
+            `Starting score: ${iterations[0]?.avgScore.toFixed(2) ?? 'N/A'}`,
+        );
+        onProgress(
+            `Final score: ${iterations[iterations.length - 1]?.avgScore.toFixed(2) ?? 'N/A'}`,
+        );
 
         return {
             success: true,
@@ -227,7 +255,8 @@ export async function runAIOptimization(
             totalApiCalls,
         };
     } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : String(error);
+        const errorMessage =
+            error instanceof Error ? error.message : String(error);
         onProgress(`\nError during optimization: ${errorMessage}`);
 
         return {
@@ -248,7 +277,11 @@ export async function runSingleAIIteration(
     iteration: number,
     simulationDurationMs = 1800000,
     runsPerStrategy = 20,
-): Promise<{ report: string; adjustments: ConfigAdjustment[]; newConfig: BalanceConfig }> {
+): Promise<{
+    report: string;
+    adjustments: ConfigAdjustment[];
+    newConfig: BalanceConfig;
+}> {
     const strategies = getAllStrategies(config);
     const batchResult = runBatchSimulation(
         config,

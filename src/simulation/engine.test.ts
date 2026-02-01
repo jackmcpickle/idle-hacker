@@ -212,7 +212,12 @@ describe('Simulation Engine', () => {
                 ...state,
                 incomeTypes: state.incomeTypes.map((t) =>
                     t.name === 'Business Cards'
-                        ? { ...t, inventory: 10, incomeMultiplier: 1.05, timeMultiplier: 1.05 }
+                        ? {
+                              ...t,
+                              inventory: 10,
+                              incomeMultiplier: 1.05,
+                              timeMultiplier: 1.05,
+                          }
                         : t,
                 ),
             };
@@ -311,9 +316,9 @@ describe('Simulation Engine', () => {
     describe('canStartHack', () => {
         it('returns false when hardware requirements not met', () => {
             const state = createInitialState(DEFAULT_BALANCE_CONFIG);
-            expect(canStartHack(state, 'wifi-crack', DEFAULT_BALANCE_CONFIG)).toBe(
-                false,
-            );
+            expect(
+                canStartHack(state, 'wifi-crack', DEFAULT_BALANCE_CONFIG),
+            ).toBe(false);
         });
 
         it('returns true when hardware requirements met', () => {
@@ -325,9 +330,9 @@ describe('Simulation Engine', () => {
                 ),
             };
 
-            expect(canStartHack(state, 'wifi-crack', DEFAULT_BALANCE_CONFIG)).toBe(
-                true,
-            );
+            expect(
+                canStartHack(state, 'wifi-crack', DEFAULT_BALANCE_CONFIG),
+            ).toBe(true);
         });
 
         it('returns false when no hack slot available', () => {
@@ -348,9 +353,9 @@ describe('Simulation Engine', () => {
                 ],
             };
 
-            expect(canStartHack(state, 'wifi-crack', DEFAULT_BALANCE_CONFIG)).toBe(
-                false,
-            );
+            expect(
+                canStartHack(state, 'wifi-crack', DEFAULT_BALANCE_CONFIG),
+            ).toBe(false);
         });
     });
 

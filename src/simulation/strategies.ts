@@ -30,7 +30,11 @@ export function createGreedyStrategy(config: BalanceConfig): AIStrategy {
                 if (canStartHack(state, hackConfig.id as HackJobId, config)) {
                     const slot = getAvailableHackSlot(state);
                     if (slot >= 0) {
-                        return { type: 'start_hack', jobId: hackConfig.id as HackJobId, slot };
+                        return {
+                            type: 'start_hack',
+                            jobId: hackConfig.id as HackJobId,
+                            slot,
+                        };
                     }
                 }
             }
@@ -43,7 +47,11 @@ export function createGreedyStrategy(config: BalanceConfig): AIStrategy {
             for (const income of state.incomeTypes) {
                 if (!isIncomeUnlocked(income, state.totalEarned)) continue;
                 if (income.cost <= bank && income.cost > bestCost) {
-                    bestAction = { type: 'buy_income', name: income.name, quantity: 1 };
+                    bestAction = {
+                        type: 'buy_income',
+                        name: income.name,
+                        quantity: 1,
+                    };
                     bestCost = income.cost;
                 }
             }
@@ -76,7 +84,11 @@ export function createBalancedStrategy(config: BalanceConfig): AIStrategy {
                 if (canStartHack(state, hackConfig.id as HackJobId, config)) {
                     const slot = getAvailableHackSlot(state);
                     if (slot >= 0) {
-                        return { type: 'start_hack', jobId: hackConfig.id as HackJobId, slot };
+                        return {
+                            type: 'start_hack',
+                            jobId: hackConfig.id as HackJobId,
+                            slot,
+                        };
                     }
                 }
             }
@@ -85,9 +97,13 @@ export function createBalancedStrategy(config: BalanceConfig): AIStrategy {
             const totalHardwareSpent = state.hardware.reduce((sum, hw) => {
                 let spent = 0;
                 for (let l = 0; l < hw.level; l++) {
-                    const hwConfig = config.hardware.find((h) => h.id === hw.id);
+                    const hwConfig = config.hardware.find(
+                        (h) => h.id === hw.id,
+                    );
                     if (hwConfig) {
-                        spent += hwConfig.baseCost * Math.pow(hwConfig.costMultiplier, l);
+                        spent +=
+                            hwConfig.baseCost *
+                            Math.pow(hwConfig.costMultiplier, l);
                     }
                 }
                 return sum + spent;
@@ -101,7 +117,8 @@ export function createBalancedStrategy(config: BalanceConfig): AIStrategy {
             // Target 30% hardware, 70% income
             const targetHardwareRatio = 0.3;
             const currentHardwareRatio =
-                totalHardwareSpent / (totalHardwareSpent + totalIncomeSpent + 1);
+                totalHardwareSpent /
+                (totalHardwareSpent + totalIncomeSpent + 1);
 
             // If below target hardware ratio, prioritize hardware
             if (currentHardwareRatio < targetHardwareRatio) {
@@ -116,7 +133,11 @@ export function createBalancedStrategy(config: BalanceConfig): AIStrategy {
 
             // Otherwise, buy income (highest efficiency)
             const efficiencies = state.incomeTypes
-                .filter((t) => isIncomeUnlocked(t, state.totalEarned) && t.cost <= bank)
+                .filter(
+                    (t) =>
+                        isIncomeUnlocked(t, state.totalEarned) &&
+                        t.cost <= bank,
+                )
                 .map((t) => ({
                     income: t,
                     efficiency: (t.income * t.incomeMultiplier) / t.cost,
@@ -149,7 +170,11 @@ export function createHackFocusedStrategy(config: BalanceConfig): AIStrategy {
                 if (canStartHack(state, hackConfig.id as HackJobId, config)) {
                     const slot = getAvailableHackSlot(state);
                     if (slot >= 0) {
-                        return { type: 'start_hack', jobId: hackConfig.id as HackJobId, slot };
+                        return {
+                            type: 'start_hack',
+                            jobId: hackConfig.id as HackJobId,
+                            slot,
+                        };
                     }
                 }
             }
@@ -163,7 +188,9 @@ export function createHackFocusedStrategy(config: BalanceConfig): AIStrategy {
                 let allMet = true;
                 let neededHw: HardwareId | null = null;
 
-                for (const [hwId, reqLevel] of Object.entries(hackConfig.requiredHardware)) {
+                for (const [hwId, reqLevel] of Object.entries(
+                    hackConfig.requiredHardware,
+                )) {
                     if ((hwLevels[hwId as HardwareId] ?? 0) < (reqLevel ?? 0)) {
                         allMet = false;
                         neededHw = hwId as HardwareId;
@@ -186,11 +213,19 @@ export function createHackFocusedStrategy(config: BalanceConfig): AIStrategy {
 
             // Buy cheapest available income to keep money flowing
             const affordable = state.incomeTypes
-                .filter((t) => isIncomeUnlocked(t, state.totalEarned) && t.cost <= bank)
+                .filter(
+                    (t) =>
+                        isIncomeUnlocked(t, state.totalEarned) &&
+                        t.cost <= bank,
+                )
                 .sort((a, b) => a.cost - b.cost);
 
             if (affordable.length > 0) {
-                return { type: 'buy_income', name: affordable[0].name, quantity: 1 };
+                return {
+                    type: 'buy_income',
+                    name: affordable[0].name,
+                    quantity: 1,
+                };
             }
 
             return { type: 'wait' };
@@ -211,7 +246,11 @@ export function createIncomeFirstStrategy(config: BalanceConfig): AIStrategy {
                 if (canStartHack(state, hackConfig.id as HackJobId, config)) {
                     const slot = getAvailableHackSlot(state);
                     if (slot >= 0) {
-                        return { type: 'start_hack', jobId: hackConfig.id as HackJobId, slot };
+                        return {
+                            type: 'start_hack',
+                            jobId: hackConfig.id as HackJobId,
+                            slot,
+                        };
                     }
                 }
             }
@@ -239,11 +278,19 @@ export function createIncomeFirstStrategy(config: BalanceConfig): AIStrategy {
 
             // Buy highest-tier affordable income
             const affordable = state.incomeTypes
-                .filter((t) => isIncomeUnlocked(t, state.totalEarned) && t.cost <= bank)
+                .filter(
+                    (t) =>
+                        isIncomeUnlocked(t, state.totalEarned) &&
+                        t.cost <= bank,
+                )
                 .sort((a, b) => b.cost - a.cost);
 
             if (affordable.length > 0) {
-                return { type: 'buy_income', name: affordable[0].name, quantity: 1 };
+                return {
+                    type: 'buy_income',
+                    name: affordable[0].name,
+                    quantity: 1,
+                };
             }
 
             return { type: 'wait' };
@@ -252,7 +299,10 @@ export function createIncomeFirstStrategy(config: BalanceConfig): AIStrategy {
 }
 
 /** Strategy that plays randomly (for comparison baseline) */
-export function createRandomStrategy(config: BalanceConfig, seed?: number): AIStrategy {
+export function createRandomStrategy(
+    config: BalanceConfig,
+    seed?: number,
+): AIStrategy {
     let rng = seed ?? Date.now();
     // eslint-disable-next-line no-bitwise -- RNG algorithm requires bitwise
     function random(): number {
@@ -292,7 +342,11 @@ export function createRandomStrategy(config: BalanceConfig, seed?: number): AISt
             for (const income of state.incomeTypes) {
                 if (!isIncomeUnlocked(income, state.totalEarned)) continue;
                 if (income.cost <= bank) {
-                    options.push({ type: 'buy_income', name: income.name, quantity: 1 });
+                    options.push({
+                        type: 'buy_income',
+                        name: income.name,
+                        quantity: 1,
+                    });
                 }
             }
 

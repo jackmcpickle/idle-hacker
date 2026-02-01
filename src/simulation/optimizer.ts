@@ -6,7 +6,11 @@
  */
 
 import type { BalanceConfig, ConfigAdjustment } from './config';
-import { DEFAULT_BALANCE_CONFIG, applyConfigAdjustments, cloneConfig } from './config';
+import {
+    DEFAULT_BALANCE_CONFIG,
+    applyConfigAdjustments,
+    cloneConfig,
+} from './config';
 import type { BatchResult, BatchSummary } from './runner';
 import { runBatchSimulation } from './runner';
 import { getAllStrategies } from './strategies';
@@ -54,7 +58,8 @@ export function createOptimizationSession(options?: {
         simulationDurationMs: options?.simulationDurationMs ?? 1800000, // 30 minutes
         runsPerStrategy: options?.runsPerStrategy ?? 20,
         tickIntervalMs: options?.tickIntervalMs ?? 100,
-        currentConfig: options?.initialConfig ?? cloneConfig(DEFAULT_BALANCE_CONFIG),
+        currentConfig:
+            options?.initialConfig ?? cloneConfig(DEFAULT_BALANCE_CONFIG),
         iterationHistory: [],
         status: 'ready',
         lastReport: '',
@@ -62,17 +67,23 @@ export function createOptimizationSession(options?: {
 }
 
 /** Run a single optimization iteration */
-export function runIteration(session: OptimizationSession): OptimizationSession {
+export function runIteration(
+    session: OptimizationSession,
+): OptimizationSession {
     if (session.currentIteration >= session.maxIterations) {
         return { ...session, status: 'completed' };
     }
 
     const strategies = getAllStrategies(session.currentConfig);
 
-    console.log(`Running iteration ${session.currentIteration + 1}/${session.maxIterations}...`);
+    console.log(
+        `Running iteration ${session.currentIteration + 1}/${session.maxIterations}...`,
+    );
     console.log(`  - Strategies: ${strategies.length}`);
     console.log(`  - Runs per strategy: ${session.runsPerStrategy}`);
-    console.log(`  - Simulation duration: ${session.simulationDurationMs / 1000}s`);
+    console.log(
+        `  - Simulation duration: ${session.simulationDurationMs / 1000}s`,
+    );
 
     const batchResult = runBatchSimulation(
         session.currentConfig,
@@ -121,7 +132,9 @@ export function applyAdjustmentsToSession(
         console.log(`Applying ${adjustments.length} adjustments...`);
         for (const adj of adjustments) {
             const target = adj.target ? ` on ${adj.target}` : '';
-            console.log(`  - ${adj.type}${target}: ${adj.percent >= 0 ? '+' : ''}${adj.percent}%`);
+            console.log(
+                `  - ${adj.type}${target}: ${adj.percent >= 0 ? '+' : ''}${adj.percent}%`,
+            );
         }
     }
 
@@ -134,7 +147,10 @@ export function applyAdjustmentsToSession(
         };
     }
 
-    const newConfig = applyConfigAdjustments(session.currentConfig, adjustments);
+    const newConfig = applyConfigAdjustments(
+        session.currentConfig,
+        adjustments,
+    );
 
     const isComplete = session.currentIteration >= session.maxIterations;
 

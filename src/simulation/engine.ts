@@ -18,16 +18,18 @@ import type { BalanceConfig, LevelTier } from './config';
 
 /** Create initial simulation state from config */
 export function createInitialState(config: BalanceConfig): SimulationState {
-    const incomeTypes: SimIncomeType[] = config.incomeTypes.map((inc, index) => ({
-        name: inc.name,
-        cost: inc.cost,
-        income: inc.income,
-        countdown: inc.countdown,
-        inventory: index === 0 ? 1 : 0, // Start with 1 Business Card
-        timeMultiplier: 1,
-        incomeMultiplier: 1,
-        unlockIncome: inc.unlockIncome,
-    }));
+    const incomeTypes: SimIncomeType[] = config.incomeTypes.map(
+        (inc, index) => ({
+            name: inc.name,
+            cost: inc.cost,
+            income: inc.income,
+            countdown: inc.countdown,
+            inventory: index === 0 ? 1 : 0, // Start with 1 Business Card
+            timeMultiplier: 1,
+            incomeMultiplier: 1,
+            unlockIncome: inc.unlockIncome,
+        }),
+    );
 
     const hardware: SimHardware[] = config.hardware.map((hw) => ({
         id: hw.id,
@@ -63,8 +65,12 @@ export function calculateIncomePerSecond(
     let totalPerSecond = 0;
     for (const income of state.incomeTypes) {
         if (income.inventory <= 0) continue;
-        const incomePerTick = income.inventory * income.income * income.incomeMultiplier;
-        const effectiveCountdown = Math.max(income.countdown / income.timeMultiplier / speedMultiplier, 1000);
+        const incomePerTick =
+            income.inventory * income.income * income.incomeMultiplier;
+        const effectiveCountdown = Math.max(
+            income.countdown / income.timeMultiplier / speedMultiplier,
+            1000,
+        );
         const ticksPerSecond = 1000 / effectiveCountdown;
         totalPerSecond += incomePerTick * ticksPerSecond;
     }
@@ -87,7 +93,9 @@ export function getHardwareCost(
 ): number {
     const hwConfig = config.hardware.find((h) => h.id === hw.id);
     if (!hwConfig) return Infinity;
-    return Math.floor(hwConfig.baseCost * Math.pow(hwConfig.costMultiplier, hw.level));
+    return Math.floor(
+        hwConfig.baseCost * Math.pow(hwConfig.costMultiplier, hw.level),
+    );
 }
 
 /** Calculate max hack slots based on RAM level */
@@ -98,7 +106,10 @@ export function calculateMaxHackSlots(state: SimulationState): number {
 }
 
 /** Get level multiplier for inventory count */
-function getLevelMultiplier(inventory: number, config: BalanceConfig): LevelTier | null {
+function getLevelMultiplier(
+    inventory: number,
+    config: BalanceConfig,
+): LevelTier | null {
     for (const tier of config.levelMultipliers) {
         if (inventory >= tier.qty) {
             return tier;
@@ -138,7 +149,8 @@ export function processTick(
             1000,
         );
         if (elapsed >= effectiveCountdown) {
-            const incomeAmount = income.inventory * income.income * income.incomeMultiplier;
+            const incomeAmount =
+                income.inventory * income.income * income.incomeMultiplier;
             newBank += incomeAmount;
             newTotalEarned += incomeAmount;
             newIncomeTimers[income.name] = now;
@@ -206,11 +218,16 @@ export function applyAction(
 ): SimulationState {
     switch (action.type) {
         case 'buy_income': {
-            const incomeType = state.incomeTypes.find((t) => t.name === action.name);
+            const incomeType = state.incomeTypes.find(
+                (t) => t.name === action.name,
+            );
             if (!incomeType) return state;
             const totalCost = incomeType.cost * action.quantity;
             if (state.bank < totalCost) return state;
-            if (!incomeType.unlockIncome || state.totalEarned >= incomeType.unlockIncome) {
+            if (
+                !incomeType.unlockIncome ||
+                state.totalEarned >= incomeType.unlockIncome
+            ) {
                 // Update inventory and multipliers
                 const newInventory = incomeType.inventory + action.quantity;
                 const tier = getLevelMultiplier(newInventory, config);
@@ -263,13 +280,16 @@ export function applyAction(
 
         case 'start_hack': {
             const { jobId, slot } = action;
-            if (slot >= state.maxHackSlots || state.activeHacks[slot]) return state;
+            if (slot >= state.maxHackSlots || state.activeHacks[slot])
+                return state;
 
             const hackConfig = config.hackJobs.find((h) => h.id === jobId);
             if (!hackConfig) return state;
 
             // Check hardware requirements
-            for (const [hwId, reqLevel] of Object.entries(hackConfig.requiredHardware)) {
+            for (const [hwId, reqLevel] of Object.entries(
+                hackConfig.requiredHardware,
+            )) {
                 const hw = state.hardware.find((h) => h.id === hwId);
                 if (!hw || hw.level < (reqLevel ?? 0)) return state;
             }
@@ -311,7 +331,10 @@ export function takeSnapshot(
         totalEarned: state.totalEarned,
         totalSpent: state.totalSpent,
         incomePerSecond: calculateIncomePerSecond(state, config),
-        totalInventory: state.incomeTypes.reduce((sum, t) => sum + t.inventory, 0),
+        totalInventory: state.incomeTypes.reduce(
+            (sum, t) => sum + t.inventory,
+            0,
+        ),
         hardwareLevels,
         activeHackCount: state.activeHacks.filter((h) => h !== null).length,
         totalHacksCompleted: state.totalHacksCompleted,
@@ -336,7 +359,9 @@ export function canStartHack(
     if (!hackConfig) return false;
 
     // Check hardware requirements
-    for (const [hwId, reqLevel] of Object.entries(hackConfig.requiredHardware)) {
+    for (const [hwId, reqLevel] of Object.entries(
+        hackConfig.requiredHardware,
+    )) {
         const hw = state.hardware.find((h) => h.id === hwId);
         if (!hw || hw.level < (reqLevel ?? 0)) return false;
     }

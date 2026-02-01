@@ -275,7 +275,9 @@ export const MAX_OFFLINE_EARNINGS_HOURS = 8;
 // =============================================================================
 
 /** Get hardware config by ID */
-export function getHardwareConfig(id: HardwareId): HardwareBalanceConfig | undefined {
+export function getHardwareConfig(
+    id: HardwareId,
+): HardwareBalanceConfig | undefined {
     return HARDWARE_BALANCE.find((h) => h.id === id);
 }
 
@@ -290,12 +292,17 @@ export function getIncomeConfig(name: string): IncomeBalanceConfig | undefined {
 }
 
 /** Calculate hardware cost at a given level */
-export function calculateHardwareCost(config: HardwareBalanceConfig, level: number): number {
+export function calculateHardwareCost(
+    config: HardwareBalanceConfig,
+    level: number,
+): number {
     return Math.floor(config.baseCost * Math.pow(config.costMultiplier, level));
 }
 
 /** Get level multiplier for inventory count */
-export function getLevelMultiplier(inventory: number): LevelMultiplierConfig | null {
+export function getLevelMultiplier(
+    inventory: number,
+): LevelMultiplierConfig | null {
     for (const tier of LEVEL_MULTIPLIERS) {
         if (inventory >= tier.qty) {
             return tier;

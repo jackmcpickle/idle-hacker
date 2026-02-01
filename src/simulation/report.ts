@@ -36,28 +36,42 @@ export function generateAIReport(
     lines.push('');
     lines.push(`## Configuration`);
     lines.push(`- Config Version: ${batchResult.config.version}`);
-    lines.push(`- Simulation Duration: ${formatDuration(batchResult.durationMs)}`);
+    lines.push(
+        `- Simulation Duration: ${formatDuration(batchResult.durationMs)}`,
+    );
     lines.push(`- Runs Per Strategy: ${batchResult.runCount}`);
     lines.push(`- Strategies Tested: ${batchResult.strategies.join(', ')}`);
     lines.push('');
 
     // Overall summary
     lines.push(`## Overall Results`);
-    lines.push(`- Average Progression Score: ${batchResult.summary.overallAvgScore.toFixed(2)}`);
-    lines.push(`- Best Performing Strategy: ${batchResult.summary.bestStrategy}`);
-    lines.push(`- Worst Performing Strategy: ${batchResult.summary.worstStrategy}`);
+    lines.push(
+        `- Average Progression Score: ${batchResult.summary.overallAvgScore.toFixed(2)}`,
+    );
+    lines.push(
+        `- Best Performing Strategy: ${batchResult.summary.bestStrategy}`,
+    );
+    lines.push(
+        `- Worst Performing Strategy: ${batchResult.summary.worstStrategy}`,
+    );
     lines.push('');
 
     // Strategy breakdown
     lines.push(`## Strategy Performance`);
     lines.push('');
-    for (const [stratName, stats] of Object.entries(batchResult.summary.byStrategy)) {
+    for (const [stratName, stats] of Object.entries(
+        batchResult.summary.byStrategy,
+    )) {
         lines.push(`### ${stratName}`);
-        lines.push(`- Progression Score: ${stats.avgProgressionScore.toFixed(2)}`);
+        lines.push(
+            `- Progression Score: ${stats.avgProgressionScore.toFixed(2)}`,
+        );
         lines.push(`- Total Earned: ${formatNumber(stats.avgTotalEarned)}`);
         lines.push(`- Influence: ${formatNumber(stats.avgInfluence)}`);
         lines.push(`- Hacks Completed: ${stats.avgHacksCompleted.toFixed(1)}`);
-        lines.push(`- Bottleneck Count: ${stats.avgBottleneckCount.toFixed(1)}`);
+        lines.push(
+            `- Bottleneck Count: ${stats.avgBottleneckCount.toFixed(1)}`,
+        );
         lines.push('');
         lines.push('Tier Unlock Rates:');
         for (const [tier, pct] of Object.entries(stats.tierUnlockPercentages)) {
@@ -117,21 +131,35 @@ export function generateAIReport(
     // Request for adjustments
     lines.push(`## Adjustment Request`);
     lines.push('');
-    lines.push('Based on the above data, please suggest balance adjustments in the following JSON format:');
+    lines.push(
+        'Based on the above data, please suggest balance adjustments in the following JSON format:',
+    );
     lines.push('');
     lines.push('```json');
     lines.push('[');
-    lines.push('  { "type": "income_cost", "target": "Income Name", "percent": -10 },');
-    lines.push('  { "type": "hardware_multiplier", "target": "cpu", "percent": -5 },');
-    lines.push('  { "type": "hack_cost", "target": "wifi-crack", "percent": -20 }');
+    lines.push(
+        '  { "type": "income_cost", "target": "Income Name", "percent": -10 },',
+    );
+    lines.push(
+        '  { "type": "hardware_multiplier", "target": "cpu", "percent": -5 },',
+    );
+    lines.push(
+        '  { "type": "hack_cost", "target": "wifi-crack", "percent": -20 }',
+    );
     lines.push(']');
     lines.push('```');
     lines.push('');
     lines.push('Available adjustment types:');
-    lines.push('- income_cost, income_reward, income_cooldown (target: income name)');
-    lines.push('- hardware_cost, hardware_multiplier, hardware_speed (target: cpu/ram/hdd/network/router)');
+    lines.push(
+        '- income_cost, income_reward, income_cooldown (target: income name)',
+    );
+    lines.push(
+        '- hardware_cost, hardware_multiplier, hardware_speed (target: cpu/ram/hdd/network/router)',
+    );
     lines.push('- hack_cost, hack_duration, hack_reward (target: hack id)');
-    lines.push('- global_income_scaling, global_hardware_scaling, global_hack_scaling (no target needed)');
+    lines.push(
+        '- global_income_scaling, global_hardware_scaling, global_hack_scaling (no target needed)',
+    );
     lines.push('');
     lines.push('Positive percent = increase, negative = decrease');
     lines.push('');
@@ -141,14 +169,22 @@ export function generateAIReport(
 
 /** Generate a summary comparing multiple iterations */
 export function generateIterationComparison(
-    iterations: Array<{ iteration: number; summary: BatchSummary; configVersion: number }>,
+    iterations: Array<{
+        iteration: number;
+        summary: BatchSummary;
+        configVersion: number;
+    }>,
 ): string {
     const lines: string[] = [];
 
     lines.push('# Balance Optimization Progress');
     lines.push('');
-    lines.push('| Iteration | Config Ver | Avg Score | Best Strategy | Recommendations |');
-    lines.push('|-----------|------------|-----------|---------------|-----------------|');
+    lines.push(
+        '| Iteration | Config Ver | Avg Score | Best Strategy | Recommendations |',
+    );
+    lines.push(
+        '|-----------|------------|-----------|---------------|-----------------|',
+    );
 
     for (const iter of iterations) {
         lines.push(
@@ -163,7 +199,9 @@ export function generateIterationComparison(
         const first = iterations[0].summary.overallAvgScore;
         const last = iterations[iterations.length - 1].summary.overallAvgScore;
         const change = ((last - first) / first) * 100;
-        lines.push(`Score changed by ${change >= 0 ? '+' : ''}${change.toFixed(1)}% across iterations`);
+        lines.push(
+            `Score changed by ${change >= 0 ? '+' : ''}${change.toFixed(1)}% across iterations`,
+        );
     }
 
     return lines.join('\n');
@@ -233,7 +271,9 @@ export function generateFinalReport(
             lines.push('- Adjustments Applied:');
             for (const adj of iter.adjustments) {
                 const target = adj.target ? ` on ${adj.target}` : '';
-                lines.push(`  - ${adj.type}${target}: ${adj.percent >= 0 ? '+' : ''}${adj.percent}%`);
+                lines.push(
+                    `  - ${adj.type}${target}: ${adj.percent >= 0 ? '+' : ''}${adj.percent}%`,
+                );
             }
         }
         lines.push('');
