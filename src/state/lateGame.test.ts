@@ -14,12 +14,12 @@ describe('Late Game State', () => {
         state.influence = 1000;
         state.totalHacksCompleted = 50;
 
-        // Add lots of inventory to hit high multipliers
-        state.incomeTypes[0].addInventory(999); // 1000 Business Cards (4x multiplier)
-        state.incomeTypes[1].addInventory(500); // 500 Freelance (3x)
-        state.incomeTypes[2].addInventory(100); // 100 Resume Updates (2x)
-        state.incomeTypes[3].addInventory(50); // 50 Bug Bounties (1.5x)
-        state.incomeTypes[4].addInventory(10); // 10 Basic Websites (1.1x)
+        // Add lots of inventory to hit high multipliers (new scaling: max 2x at 10000)
+        state.incomeTypes[0].addInventory(999); // 1000 Business Cards (1.4x multiplier)
+        state.incomeTypes[1].addInventory(500); // 500 Freelance (1.3x)
+        state.incomeTypes[2].addInventory(100); // 100 Resume Updates (1.15x)
+        state.incomeTypes[3].addInventory(50); // 50 Bug Bounties (1.1x)
+        state.incomeTypes[4].addInventory(25); // 25 Basic Websites (1.05x)
 
         // Max out hardware
         for (const hw of state.hardware) {
@@ -41,10 +41,10 @@ describe('Late Game State', () => {
             (i) => i.name === 'Freelance Tasks',
         );
 
-        // 1000 inventory = 4x multiplier
-        expect(businessCards?.incomeMultiplier).toBe(4);
-        // 500 inventory = 3x multiplier
-        expect(freelance?.incomeMultiplier).toBe(3);
+        // 1000 inventory = 1.4x multiplier (new reduced scaling)
+        expect(businessCards?.incomeMultiplier).toBe(1.4);
+        // 500 inventory = 1.3x multiplier
+        expect(freelance?.incomeMultiplier).toBe(1.3);
     });
 
     it('has maximum hardware speed bonus', () => {
@@ -53,9 +53,9 @@ describe('Late Game State', () => {
             0,
         );
 
-        // CPU: 0.1*10 + RAM: 0.08*10 + HDD: 0.06*10 + Network: 0.08*10 + Router: 0.08*10
-        // = 1.0 + 0.8 + 0.6 + 0.8 + 0.8 = 4.0
-        expect(totalSpeedBonus).toBe(4.0);
+        // CPU: 0.05*10 + RAM: 0.04*10 + HDD: 0.03*10 + Network: 0.04*10 + Router: 0.04*10
+        // = 0.5 + 0.4 + 0.3 + 0.4 + 0.4 = 2.0
+        expect(totalSpeedBonus).toBe(2.0);
     });
 
     it('has 4 hack slots available', () => {
@@ -101,15 +101,15 @@ describe('Late Game State', () => {
         // Initialize timer
         state = gameReducer(state, { type: GAME_TICK, data: { now } });
 
-        // With 5x speed multiplier (1 + 4.0 hardware bonus),
-        // 5000ms countdown becomes 1000ms
-        const oneSecondLater = now + 1000;
+        // With 3x speed multiplier (1 + 2.0 hardware bonus),
+        // 8000ms countdown becomes ~2667ms
+        const threeSecondsLater = now + 3000;
         const newState = gameReducer(state, {
             type: GAME_TICK,
-            data: { now: oneSecondLater },
+            data: { now: threeSecondsLater },
         });
 
-        // Business Cards: 1000 * 5 * 4 = 20000 income
+        // Business Cards: 1000 * 1 * 1.4 = 1400 income
         expect(newState.bank).toBeGreaterThan(state.bank);
     });
 
@@ -118,21 +118,21 @@ describe('Late Game State', () => {
         state.activeHacks[0] = {
             jobId: 'wifi-crack',
             startedAt: startTime,
-            endsAt: startTime + 60000, // 60 second hack
-            totalCostPaid: 100, // Fully paid
+            endsAt: startTime + 300000, // 5 minute hack
+            totalCostPaid: 50, // Fully paid
             lastCostTick: startTime,
         };
 
         const initialInfluence = state.influence;
 
         // Tick after hack completes
-        const afterComplete = startTime + 61000;
+        const afterComplete = startTime + 301000;
         const newState = gameReducer(state, {
             type: GAME_TICK,
             data: { now: afterComplete },
         });
 
-        expect(newState.influence).toBe(initialInfluence + 10); // wifi-crack = 10 influence
+        expect(newState.influence).toBe(initialInfluence + 500); // wifi-crack = 500 influence
         expect(newState.totalHacksCompleted).toBe(51);
         expect(newState.activeHacks[0]).toBeNull();
         expect(newState.completedHacks).toHaveLength(1);
@@ -144,9 +144,9 @@ describe('Late Game State', () => {
             (i) => i.name === 'Business Cards',
         );
 
-        // 1000 inventory * 5 base income * 4x multiplier = 20,000 per cycle
+        // 1000 inventory * 1 base income * 1.4x multiplier = 1400 per cycle
         const incomePerCycle = businessCards?.getIncome().real();
-        expect(incomePerCycle).toBe(20000);
+        expect(incomePerCycle).toBe(1400);
     });
 
     it('resets game to initial state', () => {

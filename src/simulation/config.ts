@@ -111,8 +111,10 @@ function applyIncomeAdjustment(
     const income = config.incomeTypes.find((i) => i.name === target);
     if (!income) return;
     if (type === 'income_cost') income.cost = adjustValue(income.cost, percent);
-    if (type === 'income_reward') income.income = adjustValue(income.income, percent);
-    if (type === 'income_cooldown') income.countdown = adjustValue(income.countdown, percent);
+    if (type === 'income_reward')
+        income.income = adjustValue(income.income, percent);
+    if (type === 'income_cooldown')
+        income.countdown = adjustValue(income.countdown, percent);
 }
 
 function applyHardwareAdjustment(
@@ -123,9 +125,12 @@ function applyHardwareAdjustment(
 ): void {
     const hw = config.hardware.find((h) => h.id === target);
     if (!hw) return;
-    if (type === 'hardware_cost') hw.baseCost = adjustValue(hw.baseCost, percent);
-    if (type === 'hardware_multiplier') hw.costMultiplier = adjustValue(hw.costMultiplier, percent);
-    if (type === 'hardware_speed') hw.speedBonusPerLevel = adjustValue(hw.speedBonusPerLevel, percent);
+    if (type === 'hardware_cost')
+        hw.baseCost = adjustValue(hw.baseCost, percent);
+    if (type === 'hardware_multiplier')
+        hw.costMultiplier = adjustValue(hw.costMultiplier, percent);
+    if (type === 'hardware_speed')
+        hw.speedBonusPerLevel = adjustValue(hw.speedBonusPerLevel, percent);
 }
 
 function applyHackAdjustment(
@@ -137,11 +142,17 @@ function applyHackAdjustment(
     const hack = config.hackJobs.find((h) => h.id === target);
     if (!hack) return;
     if (type === 'hack_cost') hack.cost = adjustValue(hack.cost, percent);
-    if (type === 'hack_duration') hack.duration = adjustValue(hack.duration, percent);
-    if (type === 'hack_reward') hack.influenceReward = adjustValue(hack.influenceReward, percent);
+    if (type === 'hack_duration')
+        hack.duration = adjustValue(hack.duration, percent);
+    if (type === 'hack_reward')
+        hack.influenceReward = adjustValue(hack.influenceReward, percent);
 }
 
-function applyGlobalAdjustment(config: BalanceConfig, type: ConfigAdjustment['type'], percent: number): void {
+function applyGlobalAdjustment(
+    config: BalanceConfig,
+    type: ConfigAdjustment['type'],
+    percent: number,
+): void {
     if (type === 'global_income_scaling') {
         for (const income of config.incomeTypes) {
             income.cost = adjustValue(income.cost, percent);
@@ -160,7 +171,10 @@ function applyGlobalAdjustment(config: BalanceConfig, type: ConfigAdjustment['ty
 }
 
 /** Apply a single adjustment to the config */
-function applySingleAdjustment(config: BalanceConfig, adj: ConfigAdjustment): void {
+function applySingleAdjustment(
+    config: BalanceConfig,
+    adj: ConfigAdjustment,
+): void {
     const { type, target, percent } = adj;
 
     if (type.startsWith('income_')) {

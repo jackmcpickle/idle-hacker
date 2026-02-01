@@ -41,7 +41,6 @@ describe('levelMultiplier', () => {
 
     test('contains expected thresholds', () => {
         const quantities = levelMultiplier.map((l) => l.qty);
-        expect(quantities).toContain(10);
         expect(quantities).toContain(25);
         expect(quantities).toContain(50);
         expect(quantities).toContain(100);

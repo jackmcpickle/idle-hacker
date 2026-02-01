@@ -30,7 +30,9 @@ describe('Simulation Runner', () => {
             // Should have unlocked at least Freelance Tasks (1K threshold)
             const earned = result.finalState.totalEarned;
             if (earned >= 1000) {
-                expect(result.metrics.tierUnlockTimes['Freelance Tasks']).toBeDefined();
+                expect(
+                    result.metrics.tierUnlockTimes['Freelance Tasks'],
+                ).toBeDefined();
             }
         });
 
@@ -102,7 +104,9 @@ describe('Simulation Runner', () => {
             );
 
             expect(result.summary.byStrategy['Greedy']).toBeDefined();
-            expect(result.summary.byStrategy['Greedy'].avgProgressionScore).toBeGreaterThan(0);
+            expect(
+                result.summary.byStrategy['Greedy'].avgProgressionScore,
+            ).toBeGreaterThan(0);
             expect(result.summary.overallAvgScore).toBeGreaterThan(0);
             expect(result.summary.bestStrategy).toBe('Greedy');
         });

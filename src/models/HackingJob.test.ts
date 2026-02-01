@@ -7,9 +7,9 @@ describe('HackingJob', () => {
             const job = new HackingJob('wifi-crack');
             expect(job.id).toBe('wifi-crack');
             expect(job.name).toBe('Crack WiFi');
-            expect(job.duration).toBe(60_000);
-            expect(job.cost).toBe(100);
-            expect(job.influenceReward).toBe(10);
+            expect(job.duration).toBe(300_000); // 5 minutes
+            expect(job.cost).toBe(50);
+            expect(job.influenceReward).toBe(500);
             expect(job.tier).toBe(1);
         });
 
@@ -36,7 +36,7 @@ describe('HackingJob', () => {
         it('handles complex requirements', () => {
             const job = new HackingJob('social-scrape');
             const insufficient = {
-                cpu: 1,
+                cpu: 2,
                 ram: 1,
                 hdd: 0,
                 network: 0,
@@ -45,7 +45,7 @@ describe('HackingJob', () => {
             expect(job.meetsRequirements(insufficient)).toBe(false);
 
             const sufficient = {
-                cpu: 2,
+                cpu: 3,
                 ram: 2,
                 hdd: 1,
                 network: 0,
@@ -58,12 +58,12 @@ describe('HackingJob', () => {
     describe('formatDuration', () => {
         it('formats seconds only', () => {
             const job = new HackingJob('wifi-crack');
-            expect(job.formatDuration()).toBe('1m');
+            expect(job.formatDuration()).toBe('5m'); // 5 minutes
         });
 
         it('formats minutes and seconds', () => {
             const job = new HackingJob('email-phish');
-            expect(job.formatDuration()).toBe('2m');
+            expect(job.formatDuration()).toBe('15m'); // 15 minutes
         });
     });
 

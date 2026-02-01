@@ -82,32 +82,32 @@ describe('class: IncomeType', () => {
             expect(income.inventory).toBe(6);
         });
 
-        test('applies level multiplier at threshold 10', () => {
-            const income = createIncome();
-            income.addInventory(10);
-            expect(income.timeMultiplier).toBe(1.1);
-            expect(income.incomeMultiplier).toBe(1.1);
-        });
-
         test('applies level multiplier at threshold 25', () => {
             const income = createIncome();
             income.addInventory(25);
-            expect(income.timeMultiplier).toBe(1.25);
-            expect(income.incomeMultiplier).toBe(1.25);
+            expect(income.timeMultiplier).toBe(1.05);
+            expect(income.incomeMultiplier).toBe(1.05);
+        });
+
+        test('applies level multiplier at threshold 50', () => {
+            const income = createIncome();
+            income.addInventory(50);
+            expect(income.timeMultiplier).toBe(1.1);
+            expect(income.incomeMultiplier).toBe(1.1);
         });
 
         test('applies level multiplier at threshold 100', () => {
             const income = createIncome();
             income.addInventory(100);
-            expect(income.timeMultiplier).toBe(2);
-            expect(income.incomeMultiplier).toBe(2);
+            expect(income.timeMultiplier).toBe(1.15);
+            expect(income.incomeMultiplier).toBe(1.15);
         });
 
         test('applies level multiplier at threshold 1000', () => {
             const income = createIncome();
             income.addInventory(1000);
-            expect(income.timeMultiplier).toBe(4);
-            expect(income.incomeMultiplier).toBe(4);
+            expect(income.timeMultiplier).toBe(1.4);
+            expect(income.incomeMultiplier).toBe(1.4);
         });
     });
 

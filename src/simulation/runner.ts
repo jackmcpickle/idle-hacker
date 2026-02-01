@@ -120,8 +120,13 @@ export function runSimulation(
     snapshots.push(takeSnapshot(state, config));
 
     // Calculate metrics
-    const incomeRateOverTime: Array<{ timeMs: number; incomePerSec: number }> = [];
-    for (let i = 0; i < snapshots.length; i += Math.max(1, Math.floor(snapshots.length / 20))) {
+    const incomeRateOverTime: Array<{ timeMs: number; incomePerSec: number }> =
+        [];
+    for (
+        let i = 0;
+        i < snapshots.length;
+        i += Math.max(1, Math.floor(snapshots.length / 20))
+    ) {
         incomeRateOverTime.push({
             timeMs: snapshots[i].elapsedMs,
             incomePerSec: snapshots[i].incomePerSecond,
@@ -191,7 +196,10 @@ function calculateProgressionScore(
     }
 
     // Points for total inventory
-    const totalInventory = state.incomeTypes.reduce((s, t) => s + t.inventory, 0);
+    const totalInventory = state.incomeTypes.reduce(
+        (s, t) => s + t.inventory,
+        0,
+    );
     score += Math.log10(totalInventory + 1) * 5;
 
     // Points for hacks completed
@@ -283,10 +291,17 @@ function calculateBatchSummary(
     for (const [strategyName, runs] of results.entries()) {
         const scores = runs.map((r) => r.metrics.progressionScore);
         const avgScore = scores.reduce((a, b) => a + b, 0) / scores.length;
-        const avgEarned = runs.reduce((a, r) => a + r.finalState.totalEarned, 0) / runs.length;
-        const avgInfluence = runs.reduce((a, r) => a + r.finalState.influence, 0) / runs.length;
-        const avgHacks = runs.reduce((a, r) => a + r.finalState.totalHacksCompleted, 0) / runs.length;
-        const avgBottlenecks = runs.reduce((a, r) => a + r.metrics.bottlenecks.length, 0) / runs.length;
+        const avgEarned =
+            runs.reduce((a, r) => a + r.finalState.totalEarned, 0) /
+            runs.length;
+        const avgInfluence =
+            runs.reduce((a, r) => a + r.finalState.influence, 0) / runs.length;
+        const avgHacks =
+            runs.reduce((a, r) => a + r.finalState.totalHacksCompleted, 0) /
+            runs.length;
+        const avgBottlenecks =
+            runs.reduce((a, r) => a + r.metrics.bottlenecks.length, 0) /
+            runs.length;
 
         // Calculate tier unlock percentages
         const tierUnlockPercentages: Record<string, number> = {};
@@ -295,7 +310,8 @@ function calculateBatchSummary(
             const unlockedCount = runs.filter(
                 (r) => r.metrics.tierUnlockTimes[income.name] !== undefined,
             ).length;
-            tierUnlockPercentages[income.name] = (unlockedCount / runs.length) * 100;
+            tierUnlockPercentages[income.name] =
+                (unlockedCount / runs.length) * 100;
         }
 
         byStrategy[strategyName] = {
@@ -340,7 +356,9 @@ function generateRecommendations(
 
     // Check for tier unlock issues
     for (const [stratName, stats] of Object.entries(byStrategy)) {
-        for (const [tierName, percentage] of Object.entries(stats.tierUnlockPercentages)) {
+        for (const [tierName, percentage] of Object.entries(
+            stats.tierUnlockPercentages,
+        )) {
             if (percentage < 50) {
                 recommendations.push(
                     `${tierName} only unlocked in ${percentage.toFixed(0)}% of ${stratName} runs - consider lowering unlock threshold or cost`,
@@ -369,10 +387,9 @@ function generateRecommendations(
     }
 
     // Check hack completion rates
-    const avgHacks = Object.values(byStrategy).reduce(
-        (a, s) => a + s.avgHacksCompleted,
-        0,
-    ) / Object.keys(byStrategy).length;
+    const avgHacks =
+        Object.values(byStrategy).reduce((a, s) => a + s.avgHacksCompleted, 0) /
+        Object.keys(byStrategy).length;
     if (avgHacks < 1) {
         recommendations.push(
             'Very few hacks completed on average - hardware requirements may be too steep',

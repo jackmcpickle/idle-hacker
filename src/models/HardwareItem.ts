@@ -19,8 +19,8 @@ const HARDWARE_CONFIGS: HardwareConfig[] = [
         id: 'cpu',
         name: 'CPU',
         description: 'Faster processing, faster income',
-        baseCost: 1_000,
-        speedBonusPerLevel: 0.1,
+        baseCost: 250,
+        speedBonusPerLevel: 0.05,
         maxLevel: 10,
         unlockHackTier: 1,
         icon: Cpu,
@@ -29,8 +29,8 @@ const HARDWARE_CONFIGS: HardwareConfig[] = [
         id: 'ram',
         name: 'RAM',
         description: 'More memory, more parallel tasks',
-        baseCost: 10_000,
-        speedBonusPerLevel: 0.08,
+        baseCost: 1_000,
+        speedBonusPerLevel: 0.04,
         maxLevel: 10,
         unlockHackTier: 1,
         icon: MemoryStick,
@@ -39,8 +39,8 @@ const HARDWARE_CONFIGS: HardwareConfig[] = [
         id: 'hdd',
         name: 'Storage',
         description: 'Store more data for bigger jobs',
-        baseCost: 100_000,
-        speedBonusPerLevel: 0.06,
+        baseCost: 10_000,
+        speedBonusPerLevel: 0.03,
         maxLevel: 10,
         unlockHackTier: 2,
         icon: HardDrive,
@@ -49,8 +49,8 @@ const HARDWARE_CONFIGS: HardwareConfig[] = [
         id: 'network',
         name: 'Network Card',
         description: 'Faster connection speeds',
-        baseCost: 1_000_000,
-        speedBonusPerLevel: 0.08,
+        baseCost: 100_000,
+        speedBonusPerLevel: 0.04,
         maxLevel: 10,
         unlockHackTier: 2,
         icon: Wifi,
@@ -59,8 +59,8 @@ const HARDWARE_CONFIGS: HardwareConfig[] = [
         id: 'router',
         name: 'Router',
         description: 'Better routing, harder to trace',
-        baseCost: 10_000_000,
-        speedBonusPerLevel: 0.08,
+        baseCost: 1_000_000,
+        speedBonusPerLevel: 0.04,
         maxLevel: 10,
         unlockHackTier: 3,
         icon: Router,
@@ -94,8 +94,8 @@ export class HardwareItem {
     }
 
     getCost(): number {
-        // Use 3^level for exponential scaling
-        return Math.floor(this.baseCost * Math.pow(3, this.level));
+        // Use 4^level for exponential scaling
+        return Math.floor(this.baseCost * Math.pow(4, this.level));
     }
 
     getSpeedBonus(): number {

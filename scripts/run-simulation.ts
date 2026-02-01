@@ -75,7 +75,9 @@ function parseArgs(): Args {
 }
 
 async function runQuickMode(output: string | null): Promise<void> {
-    console.log('Running quick test (5 minute simulation, 5 runs per strategy)...\n');
+    console.log(
+        'Running quick test (5 minute simulation, 5 runs per strategy)...\n',
+    );
     const report = quickRun(300000, 5);
     console.log(report);
 
@@ -89,7 +91,9 @@ async function runAIMode(args: Args): Promise<void> {
     const apiKey = process.env.ANTHROPIC_API_KEY;
 
     if (!apiKey) {
-        console.error('Error: ANTHROPIC_API_KEY environment variable is required for --ai mode');
+        console.error(
+            'Error: ANTHROPIC_API_KEY environment variable is required for --ai mode',
+        );
         console.error('');
         console.error('Set it with:');
         console.error('  export ANTHROPIC_API_KEY=your-api-key');
@@ -120,17 +124,20 @@ async function runAIMode(args: Args): Promise<void> {
         if (args.output) {
             // Save final config as JSON
             const configPath = args.output.replace(/\.[^.]+$/, '-config.json');
-            fs.writeFileSync(configPath, exportConfigAsJson({
-                maxIterations: args.iterations,
-                currentIteration: args.iterations,
-                simulationDurationMs: durationMs,
-                runsPerStrategy: args.runs,
-                tickIntervalMs: 100,
-                currentConfig: result.finalConfig,
-                iterationHistory: [],
-                status: 'completed',
-                lastReport: '',
-            }));
+            fs.writeFileSync(
+                configPath,
+                exportConfigAsJson({
+                    maxIterations: args.iterations,
+                    currentIteration: args.iterations,
+                    simulationDurationMs: durationMs,
+                    runsPerStrategy: args.runs,
+                    tickIntervalMs: 100,
+                    currentConfig: result.finalConfig,
+                    iterationHistory: [],
+                    status: 'completed',
+                    lastReport: '',
+                }),
+            );
 
             // Save full report
             fs.writeFileSync(args.output, result.finalReport);
