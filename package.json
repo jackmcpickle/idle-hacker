@@ -13,7 +13,9 @@
         "dev": "vite --port 3000",
         "vitest": "vitest run --config vitest.config.ts",
         "build": "vite build",
-        "preview": "vite preview"
+        "preview": "vite preview",
+        "simulate": "tsx scripts/run-simulation.ts",
+        "simulate:quick": "tsx scripts/run-simulation.ts --quick"
     },
     "keywords": [],
     "author": "",
