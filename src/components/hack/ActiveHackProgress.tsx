@@ -21,8 +21,7 @@ export function ActiveHackProgress({ hack, slot }: Props): ReactElement {
     const progress = Math.min(100, (elapsed / job.duration) * 100);
     const isComplete = remaining <= 0;
 
-    const isPaused = state.bank <= 0 &&
-        hack.totalCostPaid < job.getTotalCost();
+    const isPaused = state.bank <= 0 && hack.totalCostPaid < job.getTotalCost();
 
     const remainingSecs = Math.ceil(remaining / 1000);
     const mins = Math.floor(remainingSecs / 60);

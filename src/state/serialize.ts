@@ -93,8 +93,8 @@ export function deserializeState(data: unknown): GameContext | null {
     }
 
     // Migrate active hacks to add totalPausedMs for existing saves
-    const migratedActiveHacks = (saved.activeHacks ?? [null]).map(
-        (hack) => hack ? { ...hack, totalPausedMs: hack.totalPausedMs ?? 0 } : null
+    const migratedActiveHacks = (saved.activeHacks ?? [null]).map((hack) =>
+        hack ? { ...hack, totalPausedMs: hack.totalPausedMs ?? 0 } : null,
     );
 
     return {

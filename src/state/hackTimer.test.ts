@@ -73,7 +73,6 @@ describe('hack timer pause logic', () => {
         expect(costToDrain).toBeLessThan(10_000_000);
     });
 
-
     it('migrations existing hacks with totalPausedMs default to 0', () => {
         // Simulate old hack without totalPausedMs
         const oldHack = {
