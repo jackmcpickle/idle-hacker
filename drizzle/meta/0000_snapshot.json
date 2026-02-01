@@ -1,292 +1,280 @@
 {
-  "id": "00000000-0000-0000-0000-000000000000",
-  "prevId": "",
-  "version": "6",
-  "dialect": "sqlite",
-  "tables": {
-    "game_states_table": {
-      "name": "game_states_table",
-      "columns": {
-        "id": {
-          "autoincrement": true,
-          "name": "id",
-          "type": "integer",
-          "primaryKey": true,
-          "notNull": true
+    "id": "00000000-0000-0000-0000-000000000000",
+    "prevId": "",
+    "version": "6",
+    "dialect": "sqlite",
+    "tables": {
+        "game_states_table": {
+            "name": "game_states_table",
+            "columns": {
+                "id": {
+                    "autoincrement": true,
+                    "name": "id",
+                    "type": "integer",
+                    "primaryKey": true,
+                    "notNull": true
+                },
+                "userId": {
+                    "autoincrement": false,
+                    "name": "userId",
+                    "type": "integer",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "state": {
+                    "autoincrement": false,
+                    "name": "state",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "updatedAt": {
+                    "autoincrement": false,
+                    "name": "updatedAt",
+                    "type": "integer",
+                    "primaryKey": false,
+                    "notNull": true
+                }
+            },
+            "compositePrimaryKeys": {},
+            "indexes": {
+                "game_states_table_userId_unique": {
+                    "name": "game_states_table_userId_unique",
+                    "columns": ["userId"],
+                    "isUnique": true
+                }
+            },
+            "foreignKeys": {
+                "game_states_table_userId_users_table_id_fk": {
+                    "name": "game_states_table_userId_users_table_id_fk",
+                    "tableFrom": "game_states_table",
+                    "tableTo": "users_table",
+                    "columnsFrom": ["userId"],
+                    "columnsTo": ["id"],
+                    "onDelete": "cascade",
+                    "onUpdate": "no action"
+                }
+            },
+            "uniqueConstraints": {},
+            "checkConstraints": {}
         },
-        "userId": {
-          "autoincrement": false,
-          "name": "userId",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
+        "magic_links_table": {
+            "name": "magic_links_table",
+            "columns": {
+                "token": {
+                    "autoincrement": false,
+                    "name": "token",
+                    "type": "text",
+                    "primaryKey": true,
+                    "notNull": true
+                },
+                "email": {
+                    "autoincrement": false,
+                    "name": "email",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "expiresAt": {
+                    "autoincrement": false,
+                    "name": "expiresAt",
+                    "type": "integer",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "usedAt": {
+                    "autoincrement": false,
+                    "name": "usedAt",
+                    "type": "integer",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "createdAt": {
+                    "autoincrement": false,
+                    "name": "createdAt",
+                    "type": "integer",
+                    "primaryKey": false,
+                    "notNull": true
+                }
+            },
+            "compositePrimaryKeys": {},
+            "indexes": {},
+            "foreignKeys": {},
+            "uniqueConstraints": {},
+            "checkConstraints": {}
         },
-        "state": {
-          "autoincrement": false,
-          "name": "state",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
+        "sessions_table": {
+            "name": "sessions_table",
+            "columns": {
+                "id": {
+                    "autoincrement": false,
+                    "name": "id",
+                    "type": "text",
+                    "primaryKey": true,
+                    "notNull": true
+                },
+                "userId": {
+                    "autoincrement": false,
+                    "name": "userId",
+                    "type": "integer",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "expiresAt": {
+                    "autoincrement": false,
+                    "name": "expiresAt",
+                    "type": "integer",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "createdAt": {
+                    "autoincrement": false,
+                    "name": "createdAt",
+                    "type": "integer",
+                    "primaryKey": false,
+                    "notNull": true
+                }
+            },
+            "compositePrimaryKeys": {},
+            "indexes": {},
+            "foreignKeys": {
+                "sessions_table_userId_users_table_id_fk": {
+                    "name": "sessions_table_userId_users_table_id_fk",
+                    "tableFrom": "sessions_table",
+                    "tableTo": "users_table",
+                    "columnsFrom": ["userId"],
+                    "columnsTo": ["id"],
+                    "onDelete": "cascade",
+                    "onUpdate": "no action"
+                }
+            },
+            "uniqueConstraints": {},
+            "checkConstraints": {}
         },
-        "updatedAt": {
-          "autoincrement": false,
-          "name": "updatedAt",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
+        "users_table": {
+            "name": "users_table",
+            "columns": {
+                "id": {
+                    "autoincrement": true,
+                    "name": "id",
+                    "type": "integer",
+                    "primaryKey": true,
+                    "notNull": true
+                },
+                "name": {
+                    "autoincrement": false,
+                    "name": "name",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "email": {
+                    "autoincrement": false,
+                    "name": "email",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "publicName": {
+                    "autoincrement": false,
+                    "name": "publicName",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "hackerAlias": {
+                    "autoincrement": false,
+                    "name": "hackerAlias",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "createdAt": {
+                    "autoincrement": false,
+                    "name": "createdAt",
+                    "type": "integer",
+                    "primaryKey": false,
+                    "notNull": true
+                }
+            },
+            "compositePrimaryKeys": {},
+            "indexes": {
+                "users_table_email_unique": {
+                    "name": "users_table_email_unique",
+                    "columns": ["email"],
+                    "isUnique": true
+                }
+            },
+            "foreignKeys": {},
+            "uniqueConstraints": {},
+            "checkConstraints": {}
+        },
+        "pin_codes_table": {
+            "name": "pin_codes_table",
+            "columns": {
+                "id": {
+                    "autoincrement": false,
+                    "name": "id",
+                    "type": "integer",
+                    "primaryKey": true,
+                    "notNull": true
+                },
+                "email": {
+                    "autoincrement": false,
+                    "name": "email",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "pin": {
+                    "autoincrement": false,
+                    "name": "pin",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "expiresAt": {
+                    "autoincrement": false,
+                    "name": "expiresAt",
+                    "type": "integer",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "usedAt": {
+                    "autoincrement": false,
+                    "name": "usedAt",
+                    "type": "integer",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "attempts": {
+                    "default": 0,
+                    "autoincrement": false,
+                    "name": "attempts",
+                    "type": "integer",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "createdAt": {
+                    "autoincrement": false,
+                    "name": "createdAt",
+                    "type": "integer",
+                    "primaryKey": false,
+                    "notNull": true
+                }
+            },
+            "compositePrimaryKeys": {},
+            "indexes": {},
+            "foreignKeys": {},
+            "uniqueConstraints": {},
+            "checkConstraints": {}
         }
-      },
-      "compositePrimaryKeys": {},
-      "indexes": {
-        "game_states_table_userId_unique": {
-          "name": "game_states_table_userId_unique",
-          "columns": [
-            "userId"
-          ],
-          "isUnique": true
-        }
-      },
-      "foreignKeys": {
-        "game_states_table_userId_users_table_id_fk": {
-          "name": "game_states_table_userId_users_table_id_fk",
-          "tableFrom": "game_states_table",
-          "tableTo": "users_table",
-          "columnsFrom": [
-            "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
-      "uniqueConstraints": {},
-      "checkConstraints": {}
     },
-    "magic_links_table": {
-      "name": "magic_links_table",
-      "columns": {
-        "token": {
-          "autoincrement": false,
-          "name": "token",
-          "type": "text",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "email": {
-          "autoincrement": false,
-          "name": "email",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "expiresAt": {
-          "autoincrement": false,
-          "name": "expiresAt",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "usedAt": {
-          "autoincrement": false,
-          "name": "usedAt",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "createdAt": {
-          "autoincrement": false,
-          "name": "createdAt",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "compositePrimaryKeys": {},
-      "indexes": {},
-      "foreignKeys": {},
-      "uniqueConstraints": {},
-      "checkConstraints": {}
-    },
-    "sessions_table": {
-      "name": "sessions_table",
-      "columns": {
-        "id": {
-          "autoincrement": false,
-          "name": "id",
-          "type": "text",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "userId": {
-          "autoincrement": false,
-          "name": "userId",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "expiresAt": {
-          "autoincrement": false,
-          "name": "expiresAt",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "createdAt": {
-          "autoincrement": false,
-          "name": "createdAt",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "compositePrimaryKeys": {},
-      "indexes": {},
-      "foreignKeys": {
-        "sessions_table_userId_users_table_id_fk": {
-          "name": "sessions_table_userId_users_table_id_fk",
-          "tableFrom": "sessions_table",
-          "tableTo": "users_table",
-          "columnsFrom": [
-            "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
-      "uniqueConstraints": {},
-      "checkConstraints": {}
-    },
-    "users_table": {
-      "name": "users_table",
-      "columns": {
-        "id": {
-          "autoincrement": true,
-          "name": "id",
-          "type": "integer",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "name": {
-          "autoincrement": false,
-          "name": "name",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "email": {
-          "autoincrement": false,
-          "name": "email",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "publicName": {
-          "autoincrement": false,
-          "name": "publicName",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "hackerAlias": {
-          "autoincrement": false,
-          "name": "hackerAlias",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "createdAt": {
-          "autoincrement": false,
-          "name": "createdAt",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "compositePrimaryKeys": {},
-      "indexes": {
-        "users_table_email_unique": {
-          "name": "users_table_email_unique",
-          "columns": [
-            "email"
-          ],
-          "isUnique": true
-        }
-      },
-      "foreignKeys": {},
-      "uniqueConstraints": {},
-      "checkConstraints": {}
-    },
-    "pin_codes_table": {
-      "name": "pin_codes_table",
-      "columns": {
-        "id": {
-          "autoincrement": false,
-          "name": "id",
-          "type": "integer",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "email": {
-          "autoincrement": false,
-          "name": "email",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "pin": {
-          "autoincrement": false,
-          "name": "pin",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "expiresAt": {
-          "autoincrement": false,
-          "name": "expiresAt",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "usedAt": {
-          "autoincrement": false,
-          "name": "usedAt",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "attempts": {
-          "default": 0,
-          "autoincrement": false,
-          "name": "attempts",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "createdAt": {
-          "autoincrement": false,
-          "name": "createdAt",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "compositePrimaryKeys": {},
-      "indexes": {},
-      "foreignKeys": {},
-      "uniqueConstraints": {},
-      "checkConstraints": {}
+    "views": {},
+    "enums": {},
+    "_meta": {
+        "schemas": {},
+        "tables": {},
+        "columns": {}
     }
-  },
-  "views": {},
-  "enums": {},
-  "_meta": {
-    "schemas": {},
-    "tables": {},
-    "columns": {}
-  }
 }
