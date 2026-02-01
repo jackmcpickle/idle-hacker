@@ -94,7 +94,7 @@ export function getHardwareCost(
     const hwConfig = config.hardware.find((h) => h.id === hw.id);
     if (!hwConfig) return Infinity;
     return Math.floor(
-        hwConfig.baseCost * Math.pow(hwConfig.costMultiplier, hw.level),
+        hwConfig.baseCost * Math.pow(hw.level, hwConfig.costMultiplier),
     );
 }
 

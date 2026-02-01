@@ -129,7 +129,7 @@ export async function runAIOptimization(
     const {
         apiKey,
         maxIterations = 10,
-        simulationDurationMs = 1800000,
+        simulationDurationMs = 2_592_000_000, // 30 days
         runsPerStrategy = 20,
         tickIntervalMs = 100,
         initialConfig = cloneConfig(DEFAULT_BALANCE_CONFIG),

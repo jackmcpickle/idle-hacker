@@ -121,8 +121,8 @@ export const HARDWARE_BALANCE: HardwareBalanceConfig[] = [
         name: 'CPU',
         description: 'Faster processing, faster income',
         baseCost: 250, // Affordable early, gates first hack
-        costMultiplier: 4, // Steeper scaling
-        speedBonusPerLevel: 0.05, // Reduced speed bonus
+        costMultiplier: 2, // Quadratic scaling (level^2)
+        speedBonusPerLevel: 0.1, // Doubled from 0.05
         maxLevel: 10,
         unlockHackTier: 1,
     },
@@ -131,8 +131,8 @@ export const HARDWARE_BALANCE: HardwareBalanceConfig[] = [
         name: 'RAM',
         description: 'More memory, more parallel tasks',
         baseCost: 1_000,
-        costMultiplier: 4,
-        speedBonusPerLevel: 0.04,
+        costMultiplier: 2,
+        speedBonusPerLevel: 0.08, // Doubled from 0.04
         maxLevel: 10,
         unlockHackTier: 1,
     },
@@ -141,8 +141,8 @@ export const HARDWARE_BALANCE: HardwareBalanceConfig[] = [
         name: 'Storage',
         description: 'Store more data for bigger jobs',
         baseCost: 10_000,
-        costMultiplier: 4,
-        speedBonusPerLevel: 0.03,
+        costMultiplier: 2,
+        speedBonusPerLevel: 0.06, // Doubled from 0.03
         maxLevel: 10,
         unlockHackTier: 2,
     },
@@ -151,8 +151,8 @@ export const HARDWARE_BALANCE: HardwareBalanceConfig[] = [
         name: 'Network Card',
         description: 'Faster connection speeds',
         baseCost: 100_000,
-        costMultiplier: 4,
-        speedBonusPerLevel: 0.04,
+        costMultiplier: 2,
+        speedBonusPerLevel: 0.08, // Doubled from 0.04
         maxLevel: 10,
         unlockHackTier: 2,
     },
@@ -161,8 +161,8 @@ export const HARDWARE_BALANCE: HardwareBalanceConfig[] = [
         name: 'Router',
         description: 'Better routing, harder to trace',
         baseCost: 1_000_000,
-        costMultiplier: 4,
-        speedBonusPerLevel: 0.04,
+        costMultiplier: 2,
+        speedBonusPerLevel: 0.08, // Doubled from 0.04
         maxLevel: 10,
         unlockHackTier: 3,
     },
@@ -296,7 +296,7 @@ export function calculateHardwareCost(
     config: HardwareBalanceConfig,
     level: number,
 ): number {
-    return Math.floor(config.baseCost * Math.pow(config.costMultiplier, level));
+    return Math.floor(config.baseCost * Math.pow(level, config.costMultiplier));
 }
 
 /** Get level multiplier for inventory count */

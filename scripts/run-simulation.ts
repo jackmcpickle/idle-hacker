@@ -6,7 +6,7 @@
  * Options:
  *   --quick           Run a quick test (5 min sim, 5 runs)
  *   --ai              Use Claude Haiku 4.5 for AI-driven optimization
- *   --duration=N      Simulation duration in minutes (default: 30)
+ *   --duration=N      Simulation duration in minutes (default: 43200 = 30 days)
  *   --runs=N          Runs per strategy (default: 20)
  *   --iterations=N    Max optimization iterations (default: 1, or 10 with --ai)
  *   --output=FILE     Output report to file
@@ -15,9 +15,9 @@
  *   ANTHROPIC_API_KEY - Required for --ai mode
  *
  * Examples:
- *   pnpm simulate --quick                 # Quick 5-minute test
- *   pnpm simulate --duration=10 --runs=10 # 10-min sim, 10 runs per strategy
- *   pnpm simulate --ai --iterations=5     # AI optimization with 5 iterations
+ *   pnpm simulate --quick                    # Quick 5-minute test
+ *   pnpm simulate --duration=1440 --runs=10  # 1-day sim, 10 runs per strategy
+ *   pnpm simulate --ai --iterations=5        # AI optimization with 5 iterations (30 days)
  */
 
 import {
@@ -45,7 +45,7 @@ function parseArgs(): Args {
     const result: Args = {
         quick: false,
         ai: false,
-        duration: 30,
+        duration: 43200, // 30 days
         runs: 20,
         iterations: 1,
         output: null,

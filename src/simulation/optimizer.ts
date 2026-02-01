@@ -55,7 +55,7 @@ export function createOptimizationSession(options?: {
     return {
         maxIterations: options?.maxIterations ?? 10,
         currentIteration: 0,
-        simulationDurationMs: options?.simulationDurationMs ?? 1800000, // 30 minutes
+        simulationDurationMs: options?.simulationDurationMs ?? 2_592_000_000, // 30 days
         runsPerStrategy: options?.runsPerStrategy ?? 20,
         tickIntervalMs: options?.tickIntervalMs ?? 100,
         currentConfig:
