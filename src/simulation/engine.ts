@@ -165,34 +165,46 @@ export function processTick(
         const hackConfig = config.hackJobs.find((h) => h.id === hack.jobId);
         if (!hackConfig) continue;
 
-        const costPerMs = hackConfig.cost / hackConfig.duration;
+        const totalCost = hackConfig.cost;
+        const remainingCost = totalCost - hack.totalCostPaid;
+        const isPaused = newBank <= 0 && remainingCost > 0;
 
-        if (now >= hack.endsAt) {
-            // Hack completed
-            const remainingCost = hackConfig.cost - hack.totalCostPaid;
-            if (remainingCost > 0 && newBank >= remainingCost) {
-                newBank -= remainingCost;
-                newTotalSpent += remainingCost;
-            }
-            newInfluence += hackConfig.influenceReward;
-            newTotalHacksCompleted += 1;
-            newActiveHacks[slot] = null;
+        if (isPaused) {
+            // Accumulate paused time
+            const pausedDuration = now - hack.lastCostTick;
+            newActiveHacks[slot] = {
+                ...hack,
+                totalPausedMs: hack.totalPausedMs + pausedDuration,
+                lastCostTick: now,
+            };
         } else {
-            // Hack in progress - drain cost
-            const elapsedSinceLastCost = now - hack.lastCostTick;
-            const costToDrain = costPerMs * elapsedSinceLastCost;
-            const maxCost = hackConfig.cost - hack.totalCostPaid;
-            const actualCost = Math.min(costToDrain, maxCost, newBank);
-            if (actualCost > 0) {
-                newBank -= actualCost;
-                newTotalSpent += actualCost;
-                newActiveHacks[slot] = {
-                    ...hack,
-                    totalCostPaid: hack.totalCostPaid + actualCost,
-                    lastCostTick: now,
-                };
-            } else if (newBank <= 0) {
-                newActiveHacks[slot] = { ...hack, lastCostTick: now };
+            const effectiveEndsAt = hack.endsAt + hack.totalPausedMs;
+
+            if (now >= effectiveEndsAt) {
+                // Hack completed
+                if (remainingCost > 0 && newBank >= remainingCost) {
+                    newBank -= remainingCost;
+                    newTotalSpent += remainingCost;
+                }
+                newInfluence += hackConfig.influenceReward;
+                newTotalHacksCompleted += 1;
+                newActiveHacks[slot] = null;
+            } else {
+                // Hack in progress - drain cost
+                const costPerMs = hackConfig.cost / hackConfig.duration;
+                const elapsedSinceLastCost = now - hack.lastCostTick;
+                const costToDrain = costPerMs * elapsedSinceLastCost;
+                const maxCost = totalCost - hack.totalCostPaid;
+                const actualCost = Math.min(costToDrain, maxCost, newBank);
+                if (actualCost > 0) {
+                    newBank -= actualCost;
+                    newTotalSpent += actualCost;
+                    newActiveHacks[slot] = {
+                        ...hack,
+                        totalCostPaid: hack.totalCostPaid + actualCost,
+                        lastCostTick: now,
+                    };
+                }
             }
         }
     }
@@ -302,6 +314,7 @@ export function applyAction(
                 endsAt: now + hackConfig.duration,
                 totalCostPaid: 0,
                 lastCostTick: now,
+                totalPausedMs: 0,
             };
             return {
                 ...state,

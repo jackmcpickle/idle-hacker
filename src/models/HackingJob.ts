@@ -154,4 +154,5 @@ export type ActiveHack = {
     endsAt: number;
     totalCostPaid: number;
     lastCostTick: number;
+    totalPausedMs: number;
 };

@@ -15,10 +15,14 @@ export function ActiveHackProgress({ hack, slot }: Props): ReactElement {
     const job = new HackingJob(hack.jobId);
     const now = state.globalTick;
 
-    const elapsed = now - hack.startedAt;
-    const remaining = Math.max(0, hack.endsAt - now);
+    const effectiveEndsAt = hack.endsAt + hack.totalPausedMs;
+    const elapsed = now - hack.startedAt - hack.totalPausedMs;
+    const remaining = Math.max(0, effectiveEndsAt - now);
     const progress = Math.min(100, (elapsed / job.duration) * 100);
     const isComplete = remaining <= 0;
+
+    const isPaused = state.bank <= 0 &&
+        hack.totalCostPaid < job.getTotalCost();
 
     const remainingSecs = Math.ceil(remaining / 1000);
     const mins = Math.floor(remainingSecs / 60);
@@ -56,6 +60,12 @@ export function ActiveHackProgress({ hack, slot }: Props): ReactElement {
                     ${hack.totalCostPaid.toFixed(0)} / ${job.getTotalCost()}
                 </span>
             </div>
+
+            {isPaused && (
+                <div className="mb-2 text-center text-sm text-orange-600 dark:text-orange-400">
+                    ⏸ Paused - Need funds
+                </div>
+            )}
 
             {isComplete ? (
                 <Button

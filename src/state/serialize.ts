@@ -92,6 +92,11 @@ export function deserializeState(data: unknown): GameContext | null {
         }
     }
 
+    // Migrate active hacks to add totalPausedMs for existing saves
+    const migratedActiveHacks = (saved.activeHacks ?? [null]).map(
+        (hack) => hack ? { ...hack, totalPausedMs: hack.totalPausedMs ?? 0 } : null
+    );
+
     return {
         name: INITIAL_GAME_STATE.name,
         bank: saved.bank ?? 0,
@@ -105,7 +110,7 @@ export function deserializeState(data: unknown): GameContext | null {
         },
         incomeTypes,
         hardware,
-        activeHacks: saved.activeHacks ?? [null],
+        activeHacks: migratedActiveHacks,
         maxHackSlots: saved.maxHackSlots ?? 1,
         lastSyncedAt: saved.lastSyncedAt ?? Date.now(),
         incomeTimers: resetIncomeTimers,
@@ -199,10 +204,18 @@ export function calculateOfflineProgress(
 
         const job = new HackingJob(hack.jobId);
         const costPerMs = job.getCostPerSecond() / 1000;
+        const totalCost = job.getTotalCost();
+        const remainingCost = totalCost - hack.totalCostPaid;
 
-        if (now >= hack.endsAt) {
+        // Skip unpaid hacks if insufficient offline earnings (conservative)
+        if (remainingCost > earnedWhileAway) {
+            continue;
+        }
+
+        const effectiveEndsAt = hack.endsAt + hack.totalPausedMs;
+
+        if (now >= effectiveEndsAt) {
             // Hack completed - pay remaining cost
-            const remainingCost = job.getTotalCost() - hack.totalCostPaid;
             hackCostsPaid += remainingCost;
             influenceEarned += job.influenceReward;
             completedHackJobIds.push(hack.jobId);
@@ -211,8 +224,7 @@ export function calculateOfflineProgress(
             // Hack still running - pay elapsed cost
             const elapsedSinceLastCost = now - hack.lastCostTick;
             const costToDrain = costPerMs * elapsedSinceLastCost;
-            const maxCost = job.getTotalCost() - hack.totalCostPaid;
-            hackCostsPaid += Math.min(costToDrain, maxCost);
+            hackCostsPaid += Math.min(costToDrain, remainingCost);
         }
     }
 

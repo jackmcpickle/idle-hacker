@@ -36,6 +36,7 @@ export type SimActiveHack = {
     endsAt: number;
     totalCostPaid: number;
     lastCostTick: number;
+    totalPausedMs: number;
 };
 
 /** Core simulation state (no React dependencies) */
