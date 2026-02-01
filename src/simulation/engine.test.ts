@@ -51,8 +51,8 @@ describe('Simulation Engine', () => {
             // Set timer to a past time
             state = { ...state, incomeTimers: { 'Business Cards': 0 } };
 
-            // Process enough time for income to collect (5 seconds + buffer)
-            state = processTick(state, DEFAULT_BALANCE_CONFIG, 5100);
+            // Process enough time for income to collect (8 seconds + buffer)
+            state = processTick(state, DEFAULT_BALANCE_CONFIG, 8100);
 
             expect(state.bank).toBeGreaterThan(0);
             expect(state.totalEarned).toBeGreaterThan(0);
@@ -80,18 +80,18 @@ describe('Simulation Engine', () => {
                     {
                         jobId: 'wifi-crack',
                         startedAt: 0,
-                        endsAt: 60000,
-                        totalCostPaid: 100, // Already paid full cost
+                        endsAt: 300000, // 5 minutes
+                        totalCostPaid: 50, // Already paid full cost
                         lastCostTick: 0,
                     },
                 ],
             };
 
             // Process past the end time
-            state = processTick(state, DEFAULT_BALANCE_CONFIG, 61000);
+            state = processTick(state, DEFAULT_BALANCE_CONFIG, 301000);
 
             expect(state.activeHacks[0]).toBeNull();
-            expect(state.influence).toBe(10); // WiFi crack reward
+            expect(state.influence).toBe(500); // WiFi crack reward
             expect(state.totalHacksCompleted).toBe(1);
         });
     });
@@ -132,7 +132,7 @@ describe('Simulation Engine', () => {
 
         it('upgrades hardware when affordable', () => {
             let state = createInitialState(DEFAULT_BALANCE_CONFIG);
-            state = { ...state, bank: 1000 };
+            state = { ...state, bank: 250 };
 
             state = applyAction(
                 state,
@@ -142,7 +142,7 @@ describe('Simulation Engine', () => {
 
             const cpu = state.hardware.find((h) => h.id === 'cpu');
             expect(cpu?.level).toBe(1);
-            expect(state.bank).toBe(0); // 1000 - 1000 cost
+            expect(state.bank).toBe(0); // 250 - 250 cost
         });
 
         it('increases max hack slots when RAM upgraded', () => {
@@ -202,8 +202,8 @@ describe('Simulation Engine', () => {
                 DEFAULT_BALANCE_CONFIG,
             );
 
-            // 1 Business Card: 5 income per 5 seconds = 1 per second
-            expect(incomePerSec).toBe(1);
+            // 1 Business Card: 1 income per 8 seconds = 0.125 per second
+            expect(incomePerSec).toBeCloseTo(0.125, 2);
         });
 
         it('scales with inventory', () => {
@@ -212,7 +212,7 @@ describe('Simulation Engine', () => {
                 ...state,
                 incomeTypes: state.incomeTypes.map((t) =>
                     t.name === 'Business Cards'
-                        ? { ...t, inventory: 10, incomeMultiplier: 1.1, timeMultiplier: 1.1 }
+                        ? { ...t, inventory: 10, incomeMultiplier: 1.05, timeMultiplier: 1.05 }
                         : t,
                 ),
             };
@@ -222,12 +222,12 @@ describe('Simulation Engine', () => {
                 DEFAULT_BALANCE_CONFIG,
             );
 
-            // 10 Business Cards with 1.1x multiplier:
-            // income = 10 * 5 * 1.1 = 55 per tick
-            // countdown = 5000 / 1.1 = 4545.45ms
-            // ticks per second = 1000 / 4545.45 = 0.22
-            // income per second = 55 * 0.22 = 12.1
-            expect(incomePerSec).toBeCloseTo(12.1, 0);
+            // 10 Business Cards with 1.05x multiplier:
+            // income = 10 * 1 * 1.05 = 10.5 per tick
+            // countdown = 8000 / 1.05 = 7619ms
+            // ticks per second = 1000 / 7619 = 0.131
+            // income per second = 10.5 * 0.131 = 1.38
+            expect(incomePerSec).toBeCloseTo(1.38, 0);
         });
     });
 
@@ -237,16 +237,16 @@ describe('Simulation Engine', () => {
             const cpu = state.hardware.find((h) => h.id === 'cpu');
             if (!cpu) throw new Error('CPU not found');
 
-            // Level 0: 1000 * 3^0 = 1000
+            // Level 0: 250 * 4^0 = 250
+            expect(getHardwareCost(cpu, DEFAULT_BALANCE_CONFIG)).toBe(250);
+
+            // Level 1: 250 * 4^1 = 1000
+            cpu.level = 1;
             expect(getHardwareCost(cpu, DEFAULT_BALANCE_CONFIG)).toBe(1000);
 
-            // Level 1: 1000 * 3^1 = 3000
-            cpu.level = 1;
-            expect(getHardwareCost(cpu, DEFAULT_BALANCE_CONFIG)).toBe(3000);
-
-            // Level 2: 1000 * 3^2 = 9000
+            // Level 2: 250 * 4^2 = 4000
             cpu.level = 2;
-            expect(getHardwareCost(cpu, DEFAULT_BALANCE_CONFIG)).toBe(9000);
+            expect(getHardwareCost(cpu, DEFAULT_BALANCE_CONFIG)).toBe(4000);
         });
     });
 
@@ -260,8 +260,8 @@ describe('Simulation Engine', () => {
                 hardware: state.hardware.map((hw) => ({ ...hw, level: 1 })),
             };
 
-            // CPU: 0.1, RAM: 0.08, HDD: 0.06, Network: 0.08, Router: 0.08
-            expect(getHardwareSpeedBonus(state)).toBeCloseTo(0.4, 2);
+            // CPU: 0.05, RAM: 0.04, HDD: 0.03, Network: 0.04, Router: 0.04 = 0.2
+            expect(getHardwareSpeedBonus(state)).toBeCloseTo(0.2, 2);
         });
     });
 
@@ -302,9 +302,9 @@ describe('Simulation Engine', () => {
             if (!freelance) throw new Error('Freelance Tasks not found');
 
             expect(isIncomeUnlocked(freelance, 0)).toBe(false);
-            expect(isIncomeUnlocked(freelance, 999)).toBe(false);
+            expect(isIncomeUnlocked(freelance, 99)).toBe(false);
+            expect(isIncomeUnlocked(freelance, 100)).toBe(true);
             expect(isIncomeUnlocked(freelance, 1000)).toBe(true);
-            expect(isIncomeUnlocked(freelance, 10000)).toBe(true);
         });
     });
 

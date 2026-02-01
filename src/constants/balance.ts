@@ -56,58 +56,58 @@ export const INCOME_BALANCE: IncomeBalanceConfig[] = [
     {
         name: 'Business Cards',
         cost: 10,
-        income: 5,
-        countdown: 5000,
+        income: 1, // Reduced from 5 - slow start
+        countdown: 8000, // Increased from 5s to 8s
         unlockIncome: 0,
     },
     {
         name: 'Freelance Tasks',
-        cost: 1_000,
-        income: 500,
-        countdown: 6000,
-        unlockIncome: 1_000,
+        cost: 500, // Reduced cost to unlock earlier
+        income: 5, // Much lower income
+        countdown: 10000, // 10s cooldown
+        unlockIncome: 100, // Lower threshold
     },
     {
         name: 'Resume Updates',
-        cost: 100_000,
-        income: 50_000,
-        countdown: 8000,
-        unlockIncome: 100_000,
+        cost: 5_000,
+        income: 25,
+        countdown: 15000, // 15s
+        unlockIncome: 2_500,
     },
     {
         name: 'Bug Bounties',
-        cost: 10_000_000,
-        income: 5_000_000,
-        countdown: 15000,
-        unlockIncome: 10_000_000,
+        cost: 50_000,
+        income: 150,
+        countdown: 20000, // 20s
+        unlockIncome: 25_000,
     },
     {
         name: 'Basic Website',
-        cost: 1_000_000_000,
-        income: 500_000_000,
-        countdown: 30000,
-        unlockIncome: 1_000_000_000,
+        cost: 500_000,
+        income: 1_000,
+        countdown: 30000, // 30s
+        unlockIncome: 250_000,
     },
     {
         name: 'Consulting',
-        cost: 100_000_000_000,
-        income: 50_000_000_000,
-        countdown: 45000,
-        unlockIncome: 100_000_000_000,
+        cost: 5_000_000,
+        income: 5_000,
+        countdown: 45000, // 45s
+        unlockIncome: 2_500_000,
     },
     {
         name: 'E-commerce Site',
-        cost: 10_000_000_000_000,
-        income: 5_000_000_000_000,
-        countdown: 60000,
-        unlockIncome: 10_000_000_000_000,
+        cost: 50_000_000,
+        income: 25_000,
+        countdown: 60000, // 1min
+        unlockIncome: 25_000_000,
     },
     {
         name: 'SaaS Platform',
-        cost: 1_000_000_000_000_000,
-        income: 500_000_000_000_000,
-        countdown: 90000,
-        unlockIncome: 1_000_000_000_000_000,
+        cost: 500_000_000,
+        income: 100_000,
+        countdown: 90000, // 1.5min
+        unlockIncome: 250_000_000,
     },
 ];
 
@@ -120,9 +120,9 @@ export const HARDWARE_BALANCE: HardwareBalanceConfig[] = [
         id: 'cpu',
         name: 'CPU',
         description: 'Faster processing, faster income',
-        baseCost: 1_000,
-        costMultiplier: 3,
-        speedBonusPerLevel: 0.1,
+        baseCost: 250, // Affordable early, gates first hack
+        costMultiplier: 4, // Steeper scaling
+        speedBonusPerLevel: 0.05, // Reduced speed bonus
         maxLevel: 10,
         unlockHackTier: 1,
     },
@@ -130,9 +130,9 @@ export const HARDWARE_BALANCE: HardwareBalanceConfig[] = [
         id: 'ram',
         name: 'RAM',
         description: 'More memory, more parallel tasks',
-        baseCost: 10_000,
-        costMultiplier: 3,
-        speedBonusPerLevel: 0.08,
+        baseCost: 1_000,
+        costMultiplier: 4,
+        speedBonusPerLevel: 0.04,
         maxLevel: 10,
         unlockHackTier: 1,
     },
@@ -140,9 +140,9 @@ export const HARDWARE_BALANCE: HardwareBalanceConfig[] = [
         id: 'hdd',
         name: 'Storage',
         description: 'Store more data for bigger jobs',
-        baseCost: 100_000,
-        costMultiplier: 3,
-        speedBonusPerLevel: 0.06,
+        baseCost: 10_000,
+        costMultiplier: 4,
+        speedBonusPerLevel: 0.03,
         maxLevel: 10,
         unlockHackTier: 2,
     },
@@ -150,9 +150,9 @@ export const HARDWARE_BALANCE: HardwareBalanceConfig[] = [
         id: 'network',
         name: 'Network Card',
         description: 'Faster connection speeds',
-        baseCost: 1_000_000,
-        costMultiplier: 3,
-        speedBonusPerLevel: 0.08,
+        baseCost: 100_000,
+        costMultiplier: 4,
+        speedBonusPerLevel: 0.04,
         maxLevel: 10,
         unlockHackTier: 2,
     },
@@ -160,9 +160,9 @@ export const HARDWARE_BALANCE: HardwareBalanceConfig[] = [
         id: 'router',
         name: 'Router',
         description: 'Better routing, harder to trace',
-        baseCost: 10_000_000,
-        costMultiplier: 3,
-        speedBonusPerLevel: 0.08,
+        baseCost: 1_000_000,
+        costMultiplier: 4,
+        speedBonusPerLevel: 0.04,
         maxLevel: 10,
         unlockHackTier: 3,
     },
@@ -177,9 +177,9 @@ export const HACK_JOBS_BALANCE: HackJobBalanceConfig[] = [
         id: 'wifi-crack',
         name: 'Crack WiFi',
         description: 'Crack neighbor WiFi password',
-        duration: 60_000,
-        cost: 100,
-        influenceReward: 10,
+        duration: 300_000, // 5 minutes
+        cost: 50, // Low cost intro hack
+        influenceReward: 500, // Significant reward for early game
         requiredHardware: { cpu: 1 },
         tier: 1,
     },
@@ -187,9 +187,9 @@ export const HACK_JOBS_BALANCE: HackJobBalanceConfig[] = [
         id: 'email-phish',
         name: 'Phishing Email',
         description: 'Send targeted phishing emails',
-        duration: 120_000,
-        cost: 10_000,
-        influenceReward: 1_000,
+        duration: 900_000, // 15 minutes
+        cost: 1_000,
+        influenceReward: 5_000, // 5x income equivalent
         requiredHardware: { cpu: 2, network: 1 },
         tier: 1,
     },
@@ -197,50 +197,50 @@ export const HACK_JOBS_BALANCE: HackJobBalanceConfig[] = [
         id: 'social-scrape',
         name: 'Social Media Scrape',
         description: 'Scrape social media data',
-        duration: 180_000,
-        cost: 1_000_000,
-        influenceReward: 100_000,
-        requiredHardware: { cpu: 2, ram: 2, hdd: 1 },
+        duration: 1_800_000, // 30 minutes
+        cost: 25_000,
+        influenceReward: 100_000, // Major payoff
+        requiredHardware: { cpu: 3, ram: 2, hdd: 1 },
         tier: 2,
     },
     {
         id: 'ddos-small',
         name: 'Small DDoS',
         description: 'DDoS a small website',
-        duration: 300_000,
-        cost: 100_000_000,
-        influenceReward: 10_000_000,
-        requiredHardware: { cpu: 3, network: 2, router: 1 },
+        duration: 3_600_000, // 1 hour
+        cost: 500_000,
+        influenceReward: 2_500_000, // Huge reward
+        requiredHardware: { cpu: 4, network: 3, router: 1 },
         tier: 2,
     },
     {
         id: 'db-breach',
         name: 'Database Breach',
         description: 'Breach a company database',
-        duration: 600_000,
-        cost: 10_000_000_000,
-        influenceReward: 1_000_000_000,
-        requiredHardware: { cpu: 4, ram: 3, hdd: 2, network: 2 },
+        duration: 7_200_000, // 2 hours
+        cost: 10_000_000,
+        influenceReward: 75_000_000,
+        requiredHardware: { cpu: 5, ram: 4, hdd: 3, network: 3 },
         tier: 3,
     },
     {
         id: 'ransomware',
         name: 'Ransomware Attack',
         description: 'Deploy ransomware on target',
-        duration: 900_000,
-        cost: 1_000_000_000_000,
-        influenceReward: 100_000_000_000,
-        requiredHardware: { cpu: 5, ram: 4, hdd: 3, network: 3, router: 2 },
+        duration: 14_400_000, // 4 hours
+        cost: 250_000_000,
+        influenceReward: 2_000_000_000,
+        requiredHardware: { cpu: 7, ram: 5, hdd: 4, network: 4, router: 3 },
         tier: 3,
     },
     {
         id: 'govt-hack',
         name: 'Government Hack',
         description: 'Infiltrate government systems',
-        duration: 1_800_000,
-        cost: 100_000_000_000_000,
-        influenceReward: 10_000_000_000_000,
-        requiredHardware: { cpu: 7, ram: 6, hdd: 5, network: 5, router: 4 },
+        duration: 28_800_000, // 8 hours - requires real commitment
+        cost: 5_000_000_000,
+        influenceReward: 50_000_000_000, // Massive endgame reward
+        requiredHardware: { cpu: 9, ram: 7, hdd: 6, network: 6, router: 5 },
         tier: 4,
     },
 ];
@@ -249,26 +249,17 @@ export const HACK_JOBS_BALANCE: HackJobBalanceConfig[] = [
 // LEVEL MULTIPLIERS
 // =============================================================================
 
+// Reduced multipliers for slower progression - max 2x at endgame
 export const LEVEL_MULTIPLIERS: LevelMultiplierConfig[] = [
-    { qty: 1000000000, speed: 10, income: 10 },
-    { qty: 500000000, speed: 9.5, income: 9.5 },
-    { qty: 100000000, speed: 9, income: 9 },
-    { qty: 50000000, speed: 8.5, income: 8.5 },
-    { qty: 10000000, speed: 8, income: 8 },
-    { qty: 5000000, speed: 7.5, income: 7.5 },
-    { qty: 1000000, speed: 7, income: 7 },
-    { qty: 500000, speed: 6.5, income: 6.5 },
-    { qty: 100000, speed: 6, income: 6 },
-    { qty: 50000, speed: 5.5, income: 5.5 },
-    { qty: 10000, speed: 5, income: 5 },
-    { qty: 5000, speed: 4.5, income: 4.5 },
-    { qty: 1000, speed: 4, income: 4 },
-    { qty: 500, speed: 3, income: 3 },
-    { qty: 250, speed: 2.5, income: 2.5 },
-    { qty: 100, speed: 2, income: 2 },
-    { qty: 50, speed: 1.5, income: 1.5 },
-    { qty: 25, speed: 1.25, income: 1.25 },
-    { qty: 10, speed: 1.1, income: 1.1 },
+    { qty: 10000, speed: 2.0, income: 2.0 }, // Max multiplier
+    { qty: 5000, speed: 1.8, income: 1.8 },
+    { qty: 2500, speed: 1.6, income: 1.6 },
+    { qty: 1000, speed: 1.4, income: 1.4 },
+    { qty: 500, speed: 1.3, income: 1.3 },
+    { qty: 250, speed: 1.2, income: 1.2 },
+    { qty: 100, speed: 1.15, income: 1.15 },
+    { qty: 50, speed: 1.1, income: 1.1 },
+    { qty: 25, speed: 1.05, income: 1.05 },
 ];
 
 // =============================================================================

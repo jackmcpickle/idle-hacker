@@ -67,8 +67,8 @@ describe('Early Game State', () => {
     });
 
     it('can upgrade hardware when affordable', () => {
-        // Give player money for CPU upgrade (costs 1000)
-        state = gameReducer(state, { type: COLLECT_INCOME, data: 1500 });
+        // Give player money for CPU upgrade (costs 250)
+        state = gameReducer(state, { type: COLLECT_INCOME, data: 400 });
 
         const newState = gameReducer(state, {
             type: UPGRADE_HARDWARE,
@@ -77,8 +77,8 @@ describe('Early Game State', () => {
 
         const cpu = newState.hardware.find((h) => h.id === 'cpu');
         expect(cpu?.level).toBe(1);
-        expect(newState.bank).toBe(500);
-        expect(newState.totalSpent).toBe(1000);
+        expect(newState.bank).toBe(150);
+        expect(newState.totalSpent).toBe(250);
     });
 
     it('cannot start hack without required hardware', () => {
@@ -93,8 +93,8 @@ describe('Early Game State', () => {
     });
 
     it('can start hack after upgrading hardware', () => {
-        // Upgrade CPU to level 1 (costs 1000)
-        state = gameReducer(state, { type: COLLECT_INCOME, data: 1500 });
+        // Upgrade CPU to level 1 (costs 250)
+        state = gameReducer(state, { type: COLLECT_INCOME, data: 400 });
         state = gameReducer(state, { type: UPGRADE_HARDWARE, data: 'cpu' });
 
         const newState = gameReducer(state, {
@@ -125,14 +125,14 @@ describe('Early Game State', () => {
             data: { now },
         });
 
-        // Tick after countdown (5000ms for Business Cards)
-        const laterTick = now + 5000;
+        // Tick after countdown (8000ms for Business Cards)
+        const laterTick = now + 8000;
         const newState = gameReducer(state, {
             type: GAME_TICK,
             data: { now: laterTick },
         });
 
-        expect(newState.bank).toBe(5); // 1 inventory * 5 income
-        expect(newState.totalEarned).toBe(5);
+        expect(newState.bank).toBe(1); // 1 inventory * 1 income
+        expect(newState.totalEarned).toBe(1);
     });
 });
